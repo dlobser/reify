@@ -6,7 +6,8 @@ require.config({
 		"jquery" : "../deps/jquery-2.1.1.min",
 		"THREE" : "../deps/three",
 		"TERP" : "https://rawgit.com/tambien/TERP/master/TERP",
-		"TWEEN" : "../deps/tween.min"
+		"TWEEN" : "../deps/tween.min",
+		"ModelGenerator" : "../app"
 	},
 	shim : {
 		"THREE" : {
@@ -18,7 +19,7 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "Shape"], function(ready, $, ShapeGenerator){
+require(["domReady!", "jquery", "ModelGenerator/Shape"], function(ready, $, ShapeGenerator){
 
 	console.log("Reify Shape Generator v0");
 
@@ -27,8 +28,8 @@ require(["domReady!", "jquery", "Shape"], function(ready, $, ShapeGenerator){
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
 	generator.makeShape({
-		"rough" : Math.random(),
-		"block" : Math.random()
+		"pedal" : Math.random(),
+		"noise" : Math.random()
 	});
 
 });
