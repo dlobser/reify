@@ -40,7 +40,9 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, makeShape){
 
 	ShapeGenerator.prototype.animate = function(){
 		requestAnimationFrame(this.animate.bind(this));
-		this.renderer.render( this.scene, this.camera );
+		if (this.renderer){
+			this.renderer.render( this.scene, this.camera );
+		}
 		if (this.object){
 			this.object.rotateZ(0.01);
 		}
