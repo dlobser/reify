@@ -8,8 +8,8 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, makeShape){
 	var ShapeGenerator = function(container, width, height){
 		this.camera = new THREE.PerspectiveCamera( 70, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
-		this.renderer = new THREE.WebGLRenderer();
-		this.renderer.setClearColor( 0x0000000 );
+		this.renderer = new THREE.WebGLRenderer({alpha : true});
+		this.renderer.setClearColor( 0x0000000 , 0);
 		this.renderer.setSize(width, height);
 
 		container.append(this.renderer.domElement);
