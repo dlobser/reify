@@ -32,7 +32,7 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, makeShape){
 			this.scene.remove(this.object);
 		}
 
-		this.object = makeShape(Math.random(),Math.random());
+		this.object = makeShape(parameters.pedals, parameters.noise);
 		this.object.rotateX(Math.PI / 4);
 
 		this.scene.add(this.object);
