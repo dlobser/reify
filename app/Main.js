@@ -28,7 +28,7 @@ require(["domReady!", "jquery", "ModelGenerator/Shape"], function(ready, $, Shap
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
 	generator.makeShape({
-		"pedal" : Math.random(),
+		"petals" : Math.random(),
 		"noise" : Math.random(),
 		"res"	: 2000
 	});
