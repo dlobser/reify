@@ -29,7 +29,8 @@ require(["domReady!", "jquery", "ModelGenerator/Shape"], function(ready, $, Shap
 
 	generator.makeShape({
 		"pedal" : Math.random(),
-		"noise" : Math.random()
+		"noise" : Math.random(),
+		"res"	: 2000
 	});
 
 });

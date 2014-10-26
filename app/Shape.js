@@ -31,9 +31,21 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, makeShape){
 		if (this.object){
 			this.scene.remove(this.object);
 		}
+		var val = [
+			0,
+			Math.random(),
+			Math.random(),
+			Math.random(),
+			Math.random(),
+		]
+		var geom = new THREE.Geometry();
+		var pGeom = makeShape({values:val,geo:geom,extrude:true,res:3000,tubeRadius:.27});
+        var pMat = new THREE.MeshLambertMaterial(  );
+        this.object = new THREE.Mesh(pGeom,pMat);
 
-		this.object = makeShape(parameters.petals, parameters.noise);
-		this.object.rotateX(Math.PI / 4);
+
+		// this.object = makeShape(parameters.pedal, parameters.noise, parameters);
+		// this.object.rotateX(Math.PI / 4);
 
 		this.scene.add(this.object);
 	};
