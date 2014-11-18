@@ -7,7 +7,7 @@ sc1 = {
 
         b = new Balls({numBalls:6});
         b.init();
-        flower = new Flower({layers:10,curveDetail:600,resampleDetail:600,balls:b,scale:150,gridDetail:20});
+        flower = new Flower({layers:200,curveDetail:600,resampleDetail:600,balls:b,scale:100,gridDetail:90});
         flower.init();
        
         // simpleSquares.setup();
@@ -202,8 +202,8 @@ function Flower(params){
             obj.up = new THREE.Vector3(0,0,1);
             // kid.position.x = noise((i/this.resampleDetail))*.1;
             // kid.position.x = up*.02;
-            kid.position.x = Math.cos((i*pi*4/this.resampleDetail)*this.resampleDetail/10)*.01;
-            kid.position.z = Math.sin((i*pi*4/this.resampleDetail)*this.resampleDetail/10)*.01;
+            kid.position.x = Math.cos((i*pi*4/this.resampleDetail)*this.resampleDetail/20)*.01;
+            // kid.position.z = Math.sin((i*pi*4/this.resampleDetail)*this.resampleDetail/10)*.02;
             // kidA.scale.x = Math.sin((i*pi*2/this.resampleDetail)*this.resampleDetail/20);
             // kidA.position.z = Math.sin((i*pi*/this.resampleDetail)*this.resampleDetail/20)*.02;
             obj.updateMatrixWorld();
@@ -561,6 +561,7 @@ function Balls3(params){
     };//branching
 }
 
+
 function Balls4(params){
 
     args = params || {};
@@ -692,6 +693,7 @@ function Balls4(params){
 
     };//shelves
 }
+
 
 function Balls5(params){ //upside down shelves
 
@@ -915,9 +917,9 @@ function Balls(params){ //line
         // console.log(pq);
 
         this.tree.applyFunc(this.tree.makeInfo([
-            [0,0,-2],                            {sc:1,rx: Math.sin(t*.01)*.19},
-            [0,1,-2],                            {sc:1,rx:-Math.sin(t*.01)*.19},
-            [0,-1,0],                            {tz:-Math.sin(t*.01)*1},
+            [0,0,-2],                            {sc:1,rx: Math.sin(t*.02)*.19},
+            [0,1,-2],                            {sc:1,rx:-Math.sin(t*.02)*.19},
+            [0,-1,0],                            {tz:-Math.sin(t*.02)*1},
             // [0,0,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
             // [0,2,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
             // [0,4,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
@@ -2473,5 +2475,6 @@ THREE.NURBSCurve.prototype.getTangent = function ( t ) {
 
     return tangent;
 };
+
 
 

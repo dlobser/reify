@@ -4,36 +4,77 @@ sc1 = {
 
         frameRate = 1;
 
+        rData = {
+            squiggle:0,
+            rope:0,
+            tower:0,
+            KB:0,
+            zig:0,
+            squares:0,
+            sprinkles:0,
+            petals:0
+        }
 
-        b = new Balls({numBalls:6});
-        b.init();
-        flower = new Flower({layers:200,curveDetail:600,resampleDetail:600,balls:b,scale:100,gridDetail:90});
+        rebuildGui({values:{
+            nothing:0,
+
+            baseCenterScale:0,
+
+            numBalls:0,
+            bpSize:0,
+            bpLength:1,
+            bpNoisePos:0,
+            bpNoiseAnim:0,
+            bpNoiseOffset:0,
+            bpNoiseScale:0,
+            bpNSFreq:0,
+            baseTwist:0,
+
+            
+            tpPetals:0,
+            tpMult:0,
+            tpTwist:0,
+            
+        },sliders:7});
+
+        data.numBalls = .5;
+        data.baseCenterScale = .5;
+        data.bpSize = .3;
+        // b = new Balls({numBalls:6});
+        // b.init();
+        flower = new Flower({userData:data,layers:200,curveDetail:600,resampleDetail:600,scale:75,gridDetail:30});
         flower.init();
+        // flower.makeToolPath();
+
+        makeFrame(flower.scale/2);
+
+        
        
         // simpleSquares.setup();
 
-        var center = new THREE.Object3D();
-        var line = new THREE.Mesh(new THREE.CylinderGeometry( 1,1),new THREE.MeshLambertMaterial(  ));
-        line.position.x = -50;
-        line.scale.y = 100;
-        center.add(line);
-        var c1 = center.clone();
-        c1.rotation.z=pi;
-        scene.add(c1);
-        var c2 = center.clone();
-        c2.rotation.z=pi*2;
-        scene.add(c2);
-        var c3 = center.clone();
-        c3.rotation.z=pi*3;
-        scene.add(c3);
-        scene.add(center);
+        // layeredSquares.setup();
+
 
     },
 
     draw:function(time){
+
+        if(varT){
+            // console.log('h')
+            flower.animateBalls();
+        }
         // flower.animateTurtle();
         // 
         // simpleSquares.draw();
+        // layeredSquares.draw();
+        // 
+        if(varW){
+            flower.makeToolPath();
+            varW=false;
+        }
+        if(varY){
+            flower.turtle();
+        }
 
         if(varR){
 
@@ -51,7 +92,7 @@ sc1 = {
             // for(var i in flower.prnt.children[0].geometry.vertices.length){
             //     var v = flower.prnt.children[0].geometry.vertices;
             // }
-            saveGCodeMakerbot([flower.prnt.children[0].geometry.vertices],flower.scale)
+            saveGCodeMakerbot([flower.turtleDrawing.geometry.vertices],flower.scale)
             console.log(flower.prnt);
             varE=false;
         }
@@ -64,13 +105,13 @@ simpleSquares = {
     setup:function(){
 
         var cGeo = new THREE.Object3D();
-        cells = new Cells({extrude:false,parent:cGeo,amount:60});
+        cells = new Cells({extrude:false,parent:cGeo,amount:30});
         // cells.showFaces();
         cells.showLines();
         cells.make();
         // cells.showPoints();
         cells.makeFaces();
-        cells.setScale(100);
+        cells.setScale(150);
         b = new Balls({numBalls:6});
         b.init();
         console.log(b);
@@ -93,6 +134,53 @@ simpleSquares = {
     }
 }
 
+
+layeredSquares = {
+
+    setup:function(){
+
+        var cGeo = new THREE.Object3D();
+        this.cells = new Cells({extrude:true,parent:cGeo,amount:40});
+        // cells.showFaces();
+        // this.cells.showLines();
+        this.cells.make();
+        // cells.showPoints();
+        // this.cells.makeFaces();
+        this.cells.setScale(150);
+        b = new Balls({numBalls:6});
+        b.init();
+        console.log(b);
+
+        this.counter = 0;
+
+    },
+
+    draw:function(){
+
+        this.counter++;
+
+        if(this.counter>100)
+            this.counter=0;
+
+        if(typeof b === 'undefined')
+            this.setup();
+        else
+            b.animate(this.counter*(1+data.var2*5));
+        // console.log(b);
+        this.cells.updatePoints(b.balls);
+        // cells.drawNurbs();
+        this.cells.off=this.counter*(.27/150);
+
+        if(this.cells.getLineParent().children.length>100)
+            this.cells.shiftLineParent();
+
+        this.cells.drawContour();
+        // cells.drawEdges();
+
+
+    }
+}
+
 function Flower(params){
 
     args = params || {};
@@ -101,37 +189,60 @@ function Flower(params){
     this.baseDetail = args.baseDetail || 100;
     this.prnt = args.parent || new THREE.Object3D();
     this.gridDetail = args.gridDetail || 30;
-    this.balls = args.balls || [];
     this.scale = args.scale || 1;
     this.curveDetail = args.curveDetail || 100;
     this.resampleDetail = args.resampleDetail || 100;
 
-    var spiralize = args.spiralize || true;
+    this.balls = args.balls || [];
+    this.numBalls = args.balls || 7;
 
+    this.userData = args.userData || data;
+
+    //previous data
+    this.pUserData = duplicateObject(this.userData);
+
+    this.counter = 0;
+    this.counterStep = 5;
+
+    var spiralize = args.spiralize || true;
     var flowerGeo;
+
 
     this.init = function(){
 
         scene.add(this.prnt);
+
         this.cells = new Cells({extrude:true,parent:this.prnt,amount:this.gridDetail});
         this.cells.make();
-        this.cells.makeFaces();
+        // this.cells.makeFaces();
         this.cells.setScale(args.scale);
-        this.cells.showBoundary();
+        // this.cells.showBoundary();
+        if(!args.balls)
+            this._makeBalls();
+    };
+
+    this.makeToolPath = function(){
+
+        if(this.spiral){
+            purgeObject(this.spiral);
+        }
+        if(flowerGeo)
+            purgeObject(flowerGeo);
+        if(this.cells.getLineParent().children.length>0){
+            this.cells.shiftLineParent(this.cells.getLineParent().children.length);
+        }
+
 
         for(var i = 0 ; i < this.layers ; i++){
 
-            this.balls.animate((90+i));
-            
+            this.balls.animate(i);
             this.cells.updatePoints(this.balls.balls);
-
             // flowerGeo = this.cells.drawNurbs(i);
             // console.log(flowerGeo);
             this.cells.off = i*(.27/this.scale);
             this.cells.drawContour(true);
             this.cells.hideLines();
             // this.cells.drawNurbs();
-
 
             console.log(this.layers-i);
 
@@ -140,11 +251,13 @@ function Flower(params){
         flowerGeo = this.cells.getLineParent();
 
         if(!spiralize){
-            this.setSeam();
+            this._setSeam();
             this.prnt.add(flowerGeo);
         }
-        else
-            this.prnt.add(this.turtle());
+        else{
+            this.spiral = this.spiralize();
+            this.turtle();
+        }
 
         // this.animateTurtle();
 
@@ -159,12 +272,21 @@ function Flower(params){
         kidA.add(kid);
         obj.add(kidA);
 
-        var spiral = this.spiralize();
-        this.spiral = spiral;
+        // console.log('hi');
+
+        if(this.turtleDrawing)
+            purgeObject(this.turtleDrawing);
+
+
+
+        // var spiral = this.spiralize();
+        // this.spiral = spiral;
 
         var geo = new THREE.Geometry();
 
-        console.log(spiral.geometry.vertices.length);
+        var spiral = this.spiral;
+
+        // console.log(spiral.geometry.vertices.length);
 
         var up = 0;
         var ping = true;
@@ -202,8 +324,8 @@ function Flower(params){
             obj.up = new THREE.Vector3(0,0,1);
             // kid.position.x = noise((i/this.resampleDetail))*.1;
             // kid.position.x = up*.02;
-            kid.position.x = Math.cos((i*pi*4/this.resampleDetail)*this.resampleDetail/20)*.01;
-            // kid.position.z = Math.sin((i*pi*4/this.resampleDetail)*this.resampleDetail/10)*.02;
+            kid.position.x = Math.cos((i*pi*4*(1+this.userData.tpTwist*.01)/this.resampleDetail)*Math.ceil((1+this.userData.tpPetals*Math.PI*4)*20))*this.userData.tpMult*.1;
+            // kid.position.z = Math.sin((i*pi*4/this.resampleDetail)*this.resampleDetail/((1+data.var3)*20))*data.var4*.2;
             // kidA.scale.x = Math.sin((i*pi*2/this.resampleDetail)*this.resampleDetail/20);
             // kidA.position.z = Math.sin((i*pi*/this.resampleDetail)*this.resampleDetail/20)*.02;
             obj.updateMatrixWorld();
@@ -212,8 +334,14 @@ function Flower(params){
             geo.vertices.push(vec);
         }
 
+        //            kid.position.x = Math.cos((i*pi*4/this.resampleDetail)*this.resampleDetail/(Math.ceil((1+this.userData.var3*Math.PI*4)*20)))*this.userData.var4*.1;
+
+
+        console.log((Math.ceil((1+this.userData.var3)*20)));
+
         var mat = new THREE.LineBasicMaterial( { color: 0x333333, transparent: true } );
-        return new THREE.Line(geo,mat);
+        this.turtleDrawing = new THREE.Line(geo,mat);
+        this.prnt.add(this.turtleDrawing);
         // var sp = new THREE.SplineCurve3(geo.vertices);
         // return new THREE.Mesh(new THREE.TubeGeometry(new THREE.SplineCurve3(geo.vertices),geo.vertices.length,.01),new THREE.MeshLambertMaterial(  ))
     };
@@ -256,9 +384,48 @@ function Flower(params){
 
         // var mat = new THREE.LineBasicMaterial( { color: 0x333333, transparent: true } );
         // return new THREE.Line(geo,mat);
-    }
+    };
 
-    this.setSeam = function(){
+    this._makeBalls = function(){
+
+        this.balls = new Balls({userData:this.userData,pUserData:this.pUserData,numBalls:this.numBalls});
+        this.balls.init();
+    };
+
+    this.updateUserData = function(){
+
+        var check = true;
+
+        check = compareObj(this.userData,this.pUserData);
+        this.pUserData = duplicateObject(this.userData);
+
+        return check;
+    };
+
+    this.animateBalls = function(t){
+
+        this.counter+=this.counterStep;
+
+        var tCount = this.counter;
+
+        this.balls.animate(tCount);
+        this.cells.off = tCount*(.27/this.scale);
+        this.cells.updatePoints(this.balls.balls);
+        this.cells.showLines();
+
+        if(this.cells.getLineParent().children.length>this.layers/this.counterStep){
+            this.cells.shiftLineParent();
+        }
+        if(this.counter>this.layers){
+            this.counter=0;
+        }
+
+        this.updateUserData();
+
+        this.cells.drawContour(true);
+    };
+
+    this._setSeam = function(){
 
         for(var i = 0 ; i < flowerGeo.children.length ; i++){
             var g = flowerGeo.children[i].children[0].geometry;
@@ -266,7 +433,7 @@ function Flower(params){
                 var v = new THREE.Vector3(-1,0,0);
             else
                 var v = flowerGeo.children[i-1].children[0].geometry.vertices[0];
-            this.setStart(g,v);
+            this._setStart(g,v);
             //diagnostics
             // sp = sphere(.01);
             // sp.position = flowerGeo.children[i].children[0].geometry.vertices[0];
@@ -275,7 +442,7 @@ function Flower(params){
         }
     };
 
-    this.setStart = function(a,b){
+    this._setStart = function(a,b){
 
         //sets the first vertex in a to be the closets to b
    
@@ -306,7 +473,7 @@ function Flower(params){
         }
     };
 
-    this.smooth = function(a){
+    this._smooth = function(a){
 
         for(var i = 1 ; i < a.length-1 ; i++){
 
@@ -336,7 +503,7 @@ function Flower(params){
 
     this.spiralize = function(a){
 
-        this.setSeam();
+        this._setSeam();
 
         var splines = [];
 
@@ -370,7 +537,7 @@ function Flower(params){
         var spiral = new THREE.Line(geo,mat);
 
         return spiral;
-    }
+    };
 }
 
 function Balls2(params){
@@ -561,7 +728,6 @@ function Balls3(params){
     };//branching
 }
 
-
 function Balls4(params){
 
     args = params || {};
@@ -693,7 +859,6 @@ function Balls4(params){
 
     };//shelves
 }
-
 
 function Balls5(params){ //upside down shelves
 
@@ -828,7 +993,6 @@ function Balls5(params){ //upside down shelves
     };
 }
 
-
 function Balls(params){ //line
 
     args = params || {};
@@ -839,112 +1003,40 @@ function Balls(params){ //line
     this.balls = [];
     this.prnt = new THREE.Object3D();
 
+    this.userData = args.userData || data;
+    this.pUserData = args.pUserData || data;
+
     this.count = 0;
 
     var snap = [.2,.2,.2,.2,.2,.2];
 
     this.init = function(){
+
+        console.log(Math.round(1+this.userData.numBalls*10));
+
+        if(this.tree)
+            purgeObject(this.tree);
+
         this.tree = new TREE();
         this.tree.generate({
-            joints:[15],
-            angles:[pi],
-            rads:[2],
-            length:[.2],
-            start:[1],
-            width:[.3]
+            joints:[1,5],
+            angles:[0,pi],
+            rads:[1,Math.max(0,Math.round(1+this.userData.numBalls*10))],
+            length:[0.001,.1],
+            start:[0],
+            width:[1,.2]
         });
+
         this.tree.rotation.x=pi;
-        this.tree.setScale(.13);
-        var b = this.tree.worldPositionsArray(this.tree.report());
-        for(i in b){
-            for(j in b[i]){
-                var p = b[i][j];
-                var q = new Ball();
-                q.parent = this;
-                q.position = p;//new THREE.Vector3(0,0,0);
-                q.rad = .04;
-                this.balls.push(q);
-            }
-        }
+        this.tree.setScale(.3);
+        
         scene.add(this.tree);
-        // console.log(this.balls);
     };
 
-    this.animate = function(t){
+    this._updateBallPosition = function(){
 
-        var r = .2;
-
-        // var size = t/4;
-        // if(size>1)
-        //     size=1;
-
-        // var scalar = THREE.Math.smoothstep(size,0,1);
-        // var scalar2 = THREE.Math.smoothstep(size,0,1);
-        // // scalar*=.5;
-        // scalar+=.001;
-
-        // console.log(++this.count);
-        // 
-        
-
-        // if(t%20==0  && this.count<7)
-        //     this.count++;
-
-        // for(var i = this.count-2 ; i < this.count-1 ; i++){
-
-        //     // console.log(snap[i])
-        //     if(snap[i] < 1.01)
-        //         snap[i] = 1.02;
-
-           
-        // }
-
-        //  for(var i = 0 ; i < snap.length ; i++){
-        //     if(snap[i]>.1)
-        //         snap[i]-=.004;
-        //      this.tree.applyFunc(this.tree.makeInfo([
-        //         [0,i,0],       {sc:snap[i]}, 
-        //     ]),this.tree.transform);
-        // }
-
-
-
-        // var pq = t;
-
-        // if(pq>120)
-        //     pq=120;
-
-        // console.log(pq);
-
-        this.tree.applyFunc(this.tree.makeInfo([
-            [0,0,-2],                            {sc:1,rx: Math.sin(t*.02)*.19},
-            [0,1,-2],                            {sc:1,rx:-Math.sin(t*.02)*.19},
-            [0,-1,0],                            {tz:-Math.sin(t*.02)*1},
-            // [0,0,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
-            // [0,2,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
-            // [0,4,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
-            // [0,1,1],                              {rx:pi*2+t*-.01},
-            // [0,3,1],                              {rx:pi*2+t*-.01},
-            // [0,5,1],                              {rx:pi*2+t*-.01},
-        ]),this.tree.transform);
-       
-
-       // var r = .2;
-
-       // if(15-t*10>4)
-       //      r=(15-t*10)*.015;
-       //  else
-       //      r=.04;
-
-       //  scalar2*=-1;
-       //  scalar2+=1;
-
-       //  scalar2*=.2;
-       //  scalar2+=.04;
-       //  // scalar2
-       //  r=scalar2;
-
-        // console.log(t);
+        if(this.userData.numBalls!=this.pUserData.numBalls)
+            this.init();
 
         var b = this.tree.worldPositionsArray(this.tree.report());
         this.balls = [];
@@ -954,12 +1046,68 @@ function Balls(params){ //line
                 var q = new Ball();
                 q.parent = this;
                 q.position = p;//new THREE.Vector3(0,0,0);
-                q.rad = p.w;
-                // if(j=='0')
-                //     q.rad=.14;
+                q.rad = p.w;//.04;
                 this.balls.push(q);
             }
         }
+
+        this.pUserData = duplicateObject(this.userData);
+    }
+
+    this.animate = function(t){
+
+        var r = .2;
+
+        this.tree.rotation.y = t*this.userData.baseTwist*.01;
+
+        this.tree.applyFunc(this.tree.makeInfo([
+            [0,-1,-1,-1,-2],                            {
+                ty:this.userData.bpLength,
+                sc:(1+this.userData.bpSize),
+                rz: Math.sin(t*.01)*.19
+            },
+            // [0,-1,-1,-1,1],                            {ry:this.userData.bpNoisePos},
+            // [0,0,0],                            {rx:data.baseTwist*.001},
+            // [0,1,-2],                            {sc:1,rx:-Math.sin(t*.01)*.19},
+            // [0,-1,0],                            {tz:-Math.sin(t*.01)*1},
+            // [0,0,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,2,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,4,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,1,1],                              {rx:pi*2+t*-.01},
+            // [0,3,1],                              {rx:pi*2+t*-.01},
+            // [0,5,1],                              {rx:pi*2+t*-.01},
+        ]),this.tree.transform);
+
+         this.tree.applyFunc(this.tree.makeInfo([
+            // [0,-1,-1,-1,-2],                            {sc:1+this.userData.bpSize,rz: Math.sin(t*.01)*.19},
+            [0,-1,-1,-1,0],  {
+                ry:this.userData.bpNoisePos,
+                o:this.userData.bpNoiseAnim,
+                off:this.userData.bpNoiseOffset,
+                sc:this.userData.bpNSFreq,
+                scl:this.userData.bpNoiseScale
+            },
+            // [0,0,0],                            {rx:data.baseTwist*.001},
+            // [0,1,-2],                            {sc:1,rx:-Math.sin(t*.01)*.19},
+            // [0,-1,0],                            {tz:-Math.sin(t*.01)*1},
+            // [0,0,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,2,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,4,1],                              {sc:.8+(1+Math.sin(t*.02))*.2},
+            // [0,1,1],                              {rx:pi*2+t*-.01},
+            // [0,3,1],                              {rx:pi*2+t*-.01},
+            // [0,5,1],                              {rx:pi*2+t*-.01},
+        ]),function(o,args){
+            o.rotation.y = noise(args.off+1+t*args.o*.01+o.offset*13.1331)*args.ry*3;
+            var sc = 1+(noise(.1*t*args.sc+1+o.offset*.333)*(args.scl));
+            o.scale = new THREE.Vector3(sc,sc,sc);
+         });
+
+         this.tree.applyFunc(this.tree.makeInfo([
+            [0,0,-1],                            {width:this.userData.baseCenterScale*2},
+        ]),this.tree.setJointWidth);
+       
+
+        this._updateBallPosition();
 
     };
 }
@@ -1009,10 +1157,18 @@ function Cells(params){
         return lineParent;
     };
 
+    this.shiftLineParent = function(amt){
+
+        var a = amt || 1;
+
+        for(var i = 0 ; i < a ; i++){
+            this._purgeObj(lineParent.children[0]);
+        } 
+    };
+
     this.setScale = function(s){
-        console.log(prnt);
         prnt.scale.x = prnt.scale.y = prnt.scale.z = s;
-    }
+    };
 
     //make points and cells
     this.make = function(){
@@ -1128,7 +1284,7 @@ function Cells(params){
         }  
     };
 
-    this.flattenEdges = function(){
+    this._flattenEdges = function(){
 
         fEdges = [];
 
@@ -1157,7 +1313,7 @@ function Cells(params){
         fEdges = flatEdges;
     };
 
-    this.sortEdges = function(){
+    this._sortEdges = function(){
 
         sEdges = [];
 
@@ -1203,7 +1359,7 @@ function Cells(params){
         edge[0]=temp;
     };
 
-    this.edgesToContour = function(arr){
+    this._edgesToContour = function(arr){
 
         var a = sEdges;
 
@@ -1225,15 +1381,14 @@ function Cells(params){
 
     this.drawContour = function(r){
 
-        this.flattenEdges();
-        this.sortEdges();
-        this.edgesToContour();
+        this._flattenEdges();
+        this._sortEdges();
+        this._edgesToContour();
 
         var returnLargest = r ? true:false;
 
         var len = contour.length;
         var i = 0;
-
 
         if(returnLargest){
             var arrLen = 0;
@@ -1249,9 +1404,7 @@ function Cells(params){
         }
 
         // if(!extrude) 
-        this.purgeEdgeGeos();
-
-        
+        this._purgeEdgeGeos();
 
         for(; i < len ; i++){
 
@@ -1268,105 +1421,26 @@ function Cells(params){
             edgeGeo = new THREE.Line(geo,mat);
             this.edgeGeos.add(edgeGeo);
         }
-
     };
 
     this.drawNurbs = function(o){
 
-        this.flattenEdges();
-        this.sortEdges();
-        this.edgesToContour();
-        this.purgeEdgeGeos();
-
-        // var off = o || count;
-
-        // if(!extrude){
-        //     this.purgeEdgeGeos();
-        // }
-
-        // if(!this.nurbsFlower && extrude){
-        //     this.nurbsFlower = new THREE.Line(new THREE.Geometry(),new THREE.LineBasicMaterial(  ));
-        // }
+        this._flattenEdges();
+        this._sortEdges();
+        this._edgesToContour();
+        this._purgeEdgeGeos();
 
         var geo = new THREE.Geometry();
 
-        // for(var k = 0 ; k < contour.length; k++){
-
-        //     if(contour[k].length>3){
-
-        //         var nurbsControlPoints = [];
-        //         var nurbsKnots = [];
-        //         var nurbsDegree = 3;
-
-        //         for ( var i = 0; i <= nurbsDegree; i ++ ) {
-
-        //             nurbsKnots.push( 0 );
-
-        //         }
-
-
-        //         for ( var i = 0, j = contour[k].length; i < j ; i ++ ) {
-
-        //             var vec = new THREE.Vector4(
-        //                     contour[k][i].x,
-        //                     contour[k][i].y,
-        //                     contour[k][i].z,
-        //                     1 // weight of control point: higher means stronger attraction
-        //                 );
-
-        //             if(extrude)
-        //                 vec.z+=this.off;
-
-        //             nurbsControlPoints.push(vec);
-
-        //             var knot = ( i + 1 ) / ( j - nurbsDegree );
-        //             nurbsKnots.push( THREE.Math.clamp( knot, 0, 1 ) );
-
-        //         }
-
-        //         var nurbsCurve = new THREE.NURBSCurve(nurbsDegree, nurbsKnots, nurbsControlPoints);
-        //         // console.log(nurbsCurve);
-        //         geo = new THREE.Geometry();
-        //         geo.vertices = nurbsCurve.getPoints(300);
-        //         var mat = new THREE.LineBasicMaterial( { color: 0x333333, transparent: true } );
-        //         // if(!extrude){
-        //             edgeGeo = new THREE.Line(geo,mat);
-        //             this.edgeGeos.add(edgeGeo);
-        //         // }
-        //     }
-        // }
         geo.vertices = makeNurbs(contour,100,true);
         var mat = new THREE.LineBasicMaterial( { color: 0x333333, transparent: true } );
         edgeGeo = new THREE.Line(geo,mat);
         this.edgeGeos.add(edgeGeo);
-
-        // console.log(geo);
-
-        // if(extrude&&geo){
-        //     for(var i = 0 ; i < geo.vertices.length ; i++){
-        //         this.nurbsFlower.geometry.vertices.push(geo.vertices[i]);
-        //     }
-        //     return this.nurbsFlower;
-        // }
-
-
-        // for(var i = 0 ; i < contour.length ; i++){
-
-        //     var geo = new THREE.Geometry();
-        //     var mat = new THREE.LineBasicMaterial( {color:0x999999} );
-
-        //     for(var j = 0 ; j < contour[i].length ; j++){
-        //         geo.vertices.push(vertArray[i][j]);
-        //     }
-        //     edgeGeo = new THREE.Line(geo,mat);
-        //     this.edgeGeos.add(edgeGeo);
-        // }
     };
 
-    this.purgeEdgeGeos = function(){
+    this._purgeEdgeGeos = function(){
 
         if(!extrude){
-
             if(this.edgeGeos){
                 lineParent.remove(this.edgeGeos);
                 this.edgeGeos.traverse(function(obj){
@@ -1382,26 +1456,41 @@ function Cells(params){
         lineParent.add(this.edgeGeos);
     };
 
+    this._purgeObj = function(o){
+
+        if(o.parent)
+            o.parent.remove(o);
+
+        o.traverse(function(obj){
+            if(obj instanceof THREE.Line){
+                obj.geometry.dispose();
+                obj.material.dispose();
+            }
+            });
+        o = null;
+    };
+
     this.drawEdges = function(){
 
-        this.flattenEdges();
-        this.sortEdges();
+        this._flattenEdges();
+        this._sortEdges();
+        this._purgeEdgeGeos();
 
-        if(!extrude){
+        // if(!extrude){
 
-            if(this.edgeGeos){
-                lineParent.remove(this.edgeGeos);
-                this.edgeGeos.traverse(function(obj){
-                    if(obj instanceof THREE.Line){
-                        obj.geometry.dispose();
-                        obj.material.dispose();
-                    }
-                });
-                this.edgeGeos = null;
-            }
-        }
+        //     if(this.edgeGeos){
+        //         lineParent.remove(this.edgeGeos);
+        //         this.edgeGeos.traverse(function(obj){
+        //             if(obj instanceof THREE.Line){
+        //                 obj.geometry.dispose();
+        //                 obj.material.dispose();
+        //             }
+        //         });
+        //         this.edgeGeos = null;
+        //     }
+        // }
 
-        this.edgeGeos=new THREE.Object3D();
+        // this.edgeGeos=new THREE.Object3D();
         
         
         for(var i in edges){
@@ -1424,7 +1513,7 @@ function Cells(params){
             }
         }
         
-        lineParent.add(this.edgeGeos);
+        lineParent.add(this.edgeGeos);//ready to be deprecated
     };
 }
 
@@ -1848,7 +1937,7 @@ function saveGCode(arr,scalar) {
 
     // var output = " \nM73 P0 (enable build progress)\nG21 (set units to mm)\nG90 (set positioning to absolute)\nG10 P1 X-16.5 Y0 Z0 (Designate T0 Offset)\nG55 (Recall offset cooridinate system)\n(**** begin homing ****)\nG162 X Y F2500 (home XY axes maximum)\nG161 Z F1100 (home Z axis minimum)\nG92 Z-5 (set Z to -5)\nG1 Z0.0 (move Z to ÔøΩ0?)\nG161 Z F100 (home Z axis minimum)\nM132 X Y Z A B (Recall stored home offsets for XYZAB axis)\n(**** end homing ****)\nG1 X112 Y-73 Z155 F3300.0 (move to waiting position)\nG130 X0 Y0 A0 B0 (Lower stepper Vrefs while heating)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nM104 S230 T0 (set extruder temperature)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nG130 X127 Y127 A127 B127 (Set Stepper motor Vref to defaults)\nM108 R3.0 T0\nG0 X112 Y-73 (Position Nozzle)\nG0 Z0.2 (Position Height)\nM108 R4.0 (Set Extruder Speed)\nM101 (Start Extruder)\nG4 P1500 (Create Anchor)\n";
 
-    var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F9000 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
+    var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F5000 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
 
     console.log(MinX);
     console.log(MinY);
@@ -1872,8 +1961,8 @@ function saveGCode(arr,scalar) {
             var Y = arr[i][j].y * scalar;
 
 
-            X-=MinX;
-            Y-=MinY;
+            // X-=MinX;
+            // Y-=MinY;
             
 
             // var off = 110+MinX;//getOffset();
@@ -1892,8 +1981,8 @@ function saveGCode(arr,scalar) {
                 var pX = arr[i][j-1].x * scalar;
                 var pY = arr[i][j-1].y * scalar;
 
-                pX-=MinX;
-                pY-=MinY;
+                // pX-=MinX;
+                // pY-=MinY;
 
 
                 var one = X - pX;
@@ -2476,5 +2565,62 @@ THREE.NURBSCurve.prototype.getTangent = function ( t ) {
     return tangent;
 };
 
+function makeFrame(size){
 
+    var center = new THREE.Object3D();
+    var line = new THREE.Mesh(new THREE.CylinderGeometry( 1,1),new THREE.MeshLambertMaterial(  ));
+    line.position.x = -size;
+    line.scale.y = 100;
+    center.add(line);
+    var c1 = center.clone();
+    c1.rotation.z=pi;
+    scene.add(c1);
+    var c2 = center.clone();
+    c2.rotation.z=pi*2;
+    scene.add(c2);
+    var c3 = center.clone();
+    c3.rotation.z=pi*3;
+    scene.add(c3);
+    scene.add(center);
+}
+
+function purgeObject(o){
+
+    if(o.parent)
+        o.parent.remove(o);
+
+    o.traverse(function(obj){
+        if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
+            obj.geometry.dispose();
+            obj.material.dispose();
+            // obj.geometry.vertices = [];
+        }
+        });
+    o = null;
+};
+
+
+var compareObj = function(a,b){
+
+    var returner = true;
+
+    for(var k in a){
+        if(b[k]!=a[k])
+            returner = false;
+    }
+
+    return returner;
+
+}
+
+function duplicateObject(a){
+
+    var b = {};
+
+    for(var k in a){
+        b[k] = a[k];
+    }
+
+    return b;
+}
 
