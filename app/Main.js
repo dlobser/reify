@@ -5,6 +5,7 @@ require.config({
 		"domReady" : "../deps/domReady",
 		"jquery" : "../deps/jquery-2.1.1.min",
 		"THREE" : "../deps/three",
+		"TREE" : "../deps/TREE",
 		"TERP" : "https://rawgit.com/tambien/TERP/master/TERP",
 		"TWEEN" : "../deps/tween.min",
 		"ModelGenerator" : "../app"
@@ -12,6 +13,9 @@ require.config({
 	shim : {
 		"THREE" : {
 			exports : "THREE"
+		},
+		"TREE" : {
+			exports : "TREE"
 		},
 		"TWEEN" : {
 			exports : "TWEEN"

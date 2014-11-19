@@ -5,8 +5,9 @@ sc1 = {
         frameRate = 1;
 
         rData = {
+            nada:0,
             squiggle:0,
-            rope:0,
+            rope:.5,
             tower:0,
             KB:0,
             zig:0,
@@ -15,49 +16,85 @@ sc1 = {
             petals:0
         }
 
-        rebuildGui({values:{
-            nothing:0,
 
-            baseCenterScale:0,
+        // var val = {
 
-            numBalls:0,
-            bpSize:0,
-            bpLength:1,
-            bpNoisePos:0,
-            bpNoiseAnim:0,
-            bpNoiseOffset:0,
-            bpNoiseScale:0,
-            bpNSFreq:0,
-            baseTwist:0,
+        //     nothing:0,
+
+        //     baseCenterScale:0,
+
+        //     numBalls:0,
+        //     bpSize:0,
+        //     bpLength:1,
+        //     bpNoisePos:0,
+        //     bpNoiseAnim:0,
+        //     bpNoiseOffset:0,
+        //     bpNoiseScale:0,
+        //     bpNSFreq:0,
+        //     baseTwist:0,
 
             
-            tpPetals:0,
-            tpMult:0,
-            tpTwist:0,
+        //     tpPetals:0,
+        //     tpMult:0,
+        //     tpLoop:0,
+        //     tpTwist:0,
+        //     tpFlipFlop:0,
             
-        },sliders:7});
+        // };
 
-        data.numBalls = .5;
-        data.baseCenterScale = .5;
-        data.bpSize = .3;
-        // b = new Balls({numBalls:6});
-        // b.init();
-        flower = new Flower({userData:data,layers:200,curveDetail:600,resampleDetail:600,scale:75,gridDetail:30});
+        // this.vals = setValuesFromData(rData);
+
+        rebuildGui({values:rData,sliders:7});
+        
+        data.squiggle=.5;
+        data.rope=.5;
+        data.tower=.5;
+        data.KB=.5;
+        data.zig=.5;
+        data.squares=.5;
+        data.sprinkles=.5;
+        data.petals=.5;
+
+        // this.layerHeight = mm in height - .27 is default
+        // this.layers = number of slices to lay down;
+        // this.gridDetail = number of cells in marching squares (30 is default)
+        // this.scale = scale of bounding box in mm
+        // this.curveDetail =    amounts to resample nurbs curves by - default is 600 - for now make them the same #
+        // this.resampleDetail = amounts to resample nurbs curves by - default is 600 - for now make them the same #
+        // this.data = data to use 
+        // this.counterStep = how many gaps to leave between layers (for faster previes)
+
+        cStep = 10;
+
+        flower = new Flower({
+            data:rData,
+            layers:200,
+            curveDetail:600,
+            resampleDetail:600,
+            scale:75,
+            gridDetail:30,
+            counterStep:cStep
+        });
+
+
         flower.init();
+        // flower.animateBalls();
+        flower.makeToolPath();
+        flower.turtle();
         // flower.makeToolPath();
 
         makeFrame(flower.scale/2);
-
-        
        
         // simpleSquares.setup();
-
         // layeredSquares.setup();
-
 
     },
 
     draw:function(time){
+
+        // flower.userData = setValuesFromData(data);
+        // flower.userData.baseCenterScale = Math.random();
+
 
         if(varT){
             // console.log('h')
@@ -73,7 +110,20 @@ sc1 = {
             varW=false;
         }
         if(varY){
+            // console.log(count);
             flower.turtle();
+        }
+
+        if(var2){
+            if(cStep==10)
+                cStep=0;
+            else
+                cStep=10;
+
+            console.log(cStep);
+            flower.counterStep = cStep;
+            varW=true;
+            var2=false;
         }
 
         if(varR){
@@ -86,8 +136,7 @@ sc1 = {
             console.log(flower.prnt);
             varR=false;
         }
-         if(varE){
-
+        if(varE){
             // var n = [];
             // for(var i in flower.prnt.children[0].geometry.vertices.length){
             //     var v = flower.prnt.children[0].geometry.vertices;
@@ -99,6 +148,7 @@ sc1 = {
 
     }
 };
+
 
 simpleSquares = {
 
@@ -133,7 +183,6 @@ simpleSquares = {
 
     }
 }
-
 
 layeredSquares = {
 
@@ -186,7 +235,7 @@ function Flower(params){
     args = params || {};
     this.layerHeight = args.layerHeight || 0.27;
     this.layers = args.layers || 100;
-    this.baseDetail = args.baseDetail || 100;
+    // this.baseDetail = args.baseDetail || 100;
     this.prnt = args.parent || new THREE.Object3D();
     this.gridDetail = args.gridDetail || 30;
     this.scale = args.scale || 1;
@@ -196,13 +245,14 @@ function Flower(params){
     this.balls = args.balls || [];
     this.numBalls = args.balls || 7;
 
-    this.userData = args.userData || data;
-
+    this.processData = args.data || data;
+    
     //previous data
     this.pUserData = duplicateObject(this.userData);
+   
 
     this.counter = 0;
-    this.counterStep = 5;
+    this.counterStep = (typeof args.counterStep==='undefined') ? 5 : args.counterStep;
 
     var spiralize = args.spiralize || true;
     var flowerGeo;
@@ -216,9 +266,53 @@ function Flower(params){
         this.cells.make();
         // this.cells.makeFaces();
         this.cells.setScale(args.scale);
+        this.userData = this._setValuesFromData(this.processData) || data;
+        this.balls.userData = this.userData;
+        this.balls.userData.layers = this.layers;
         // this.cells.showBoundary();
         if(!args.balls)
             this._makeBalls();
+    };
+
+    this._setValuesFromData = function(a){
+
+        var petalsVal1 = THREE.Math.mapLinear(a.petals,0,1,.3,.5);
+        var petalsVal2 = THREE.Math.mapLinear(a.petals,0,1,.15,0);
+        var petalsVal3 = THREE.Math.mapLinear(a.petals,0,1,.1,0);
+        var ropeMap = THREE.Math.mapLinear(a.rope,0,1,.2,0);
+        var towerMult = Math.abs(THREE.Math.mapLinear(a.tower,.5,1,0,.5));
+        var towerOff = THREE.Math.mapLinear(a.tower,0,1,1,-1);
+        var squiggler = THREE.Math.mapLinear(a.squiggle,0,1,0,.0125);
+        // var mSprinkle = THREE.Math.mapLinear(a.sprinkles,0,1,0,1);
+
+        return {
+
+            nothing:0,
+
+            baseCenterScale:petalsVal1,
+
+            numBalls:.68,
+            bpSize:petalsVal2*(.5-towerMult),
+            bpLength:petalsVal3,
+            bpNoisePos:a.squares,
+            bpNoiseAnim:a.squares*.3,
+            bpNoiseOffset:.5,//a.tower*towerMult,
+            bpNoiseScale:towerOff*towerMult,
+            bpNSFreq:.1,
+            baseTwist:0,
+            bpScaleUp:towerOff*.3,
+            
+            tpPetals:a.zig*.3,
+            tpMult:ropeMap,
+            tpLoop:THREE.Math.mapLinear(a.KB,0,1,-.1,.1),
+            tpTwist:squiggler,
+            tpNoiseMult:a.sprinkles,
+            tpNoiseFreq:a.sprinkles,
+            tpFlipFlop:1,
+            
+
+        };
+
     };
 
     this.makeToolPath = function(){
@@ -232,7 +326,6 @@ function Flower(params){
             this.cells.shiftLineParent(this.cells.getLineParent().children.length);
         }
 
-
         for(var i = 0 ; i < this.layers ; i++){
 
             this.balls.animate(i);
@@ -245,6 +338,8 @@ function Flower(params){
             // this.cells.drawNurbs();
 
             console.log(this.layers-i);
+
+            i+=this.counterStep;
 
         }
 
@@ -269,7 +364,9 @@ function Flower(params){
         var obj = new THREE.Object3D();
         var kidA = new THREE.Object3D();
         var kid = new THREE.Object3D();
+        var angle = new THREE.Object3D();
         kidA.add(kid);
+        kidA.add(angle);
         obj.add(kidA);
 
         // console.log('hi');
@@ -324,9 +421,18 @@ function Flower(params){
             obj.up = new THREE.Vector3(0,0,1);
             // kid.position.x = noise((i/this.resampleDetail))*.1;
             // kid.position.x = up*.02;
-            kid.position.x = Math.cos((i*pi*4*(1+this.userData.tpTwist*.01)/this.resampleDetail)*Math.ceil((1+this.userData.tpPetals*Math.PI*4)*20))*this.userData.tpMult*.1;
+            // 
+            var twister = this.userData.tpTwist;
+            kid.position.x = Math.cos((i*pi*4*(1+this.userData.tpTwist)/this.resampleDetail)*Math.ceil((.1+this.userData.tpPetals*Math.PI*4)*20))*this.userData.tpMult*.1;
+            kid.position.z = Math.sin((i*pi*4*(1+this.userData.tpTwist)/this.resampleDetail)*Math.ceil((.1+this.userData.tpPetals*Math.PI*4)*20))*this.userData.tpLoop*THREE.Math.mapLinear(this.userData.tpPetals,0,.3,.26,.03);
+            var sm = this.userData.tpNoiseFreq*15;
+            kid.position.x += noise(a.x*sm,a.y*sm,a.z*sm)*this.userData.tpNoiseMult*.03;
+            if(Math.cos((i*pi*4*(1+this.userData.tpTwist*.01)/this.resampleDetail)*Math.ceil((1+this.userData.tpPetals*Math.PI*4)*20))>0)
+                angle.position.x+=data.var5*.1;
+            else
+                angle.position.x-=data.var5*.1;
             // kid.position.z = Math.sin((i*pi*4/this.resampleDetail)*this.resampleDetail/((1+data.var3)*20))*data.var4*.2;
-            // kidA.scale.x = Math.sin((i*pi*2/this.resampleDetail)*this.resampleDetail/20);
+            // kidA.scale.x = Math.cos((i*pi*2*(1+this.userData.tpTwist*.01)/this.resampleDetail)*Math.ceil((1+this.userData.tpPetals*Math.PI*4)*20))*(this.userData.tpFlipFlop);
             // kidA.position.z = Math.sin((i*pi*/this.resampleDetail)*this.resampleDetail/20)*.02;
             obj.updateMatrixWorld();
             var vec = new THREE.Vector3();
@@ -337,7 +443,7 @@ function Flower(params){
         //            kid.position.x = Math.cos((i*pi*4/this.resampleDetail)*this.resampleDetail/(Math.ceil((1+this.userData.var3*Math.PI*4)*20)))*this.userData.var4*.1;
 
 
-        console.log((Math.ceil((1+this.userData.var3)*20)));
+        // console.log((Math.ceil((1+this.userData.var3)*20)));
 
         var mat = new THREE.LineBasicMaterial( { color: 0x333333, transparent: true } );
         this.turtleDrawing = new THREE.Line(geo,mat);
@@ -403,6 +509,11 @@ function Flower(params){
     };
 
     this.animateBalls = function(t){
+
+        this.userData = this._setValuesFromData(this.processData);
+
+        this.balls.userData = this.userData;
+        this.balls.userData.layers = this.layers;
 
         this.counter+=this.counterStep;
 
@@ -1085,7 +1196,9 @@ function Balls(params){ //line
                 o:this.userData.bpNoiseAnim,
                 off:this.userData.bpNoiseOffset,
                 sc:this.userData.bpNSFreq,
-                scl:this.userData.bpNoiseScale
+                scl:this.userData.bpNoiseScale,
+                lscl:this.userData.layers,
+                uscl:this.userData.bpScaleUp,
             },
             // [0,0,0],                            {rx:data.baseTwist*.001},
             // [0,1,-2],                            {sc:1,rx:-Math.sin(t*.01)*.19},
@@ -1099,11 +1212,13 @@ function Balls(params){ //line
         ]),function(o,args){
             o.rotation.y = noise(args.off+1+t*args.o*.01+o.offset*13.1331)*args.ry*3;
             var sc = 1+(noise(.1*t*args.sc+1+o.offset*.333)*(args.scl));
+            sc*=1+(THREE.Math.mapLinear(t/args.lscl,0,1,-1,1))*args.uscl;
             o.scale = new THREE.Vector3(sc,sc,sc);
          });
 
          this.tree.applyFunc(this.tree.makeInfo([
-            [0,0,-1],                            {width:this.userData.baseCenterScale*2},
+            [0,0,-1],                            {width:this.userData.baseCenterScale*2*
+                (1+(THREE.Math.mapLinear(t/this.userData.layers,0,1,-1,1))*this.userData.bpScaleUp)},
         ]),this.tree.setJointWidth);
        
 
@@ -1786,68 +1901,6 @@ function arraysEqual(a, b) {
   return true;
 }
 
-// function setStart(a,b){
-
-//     //sets the first vertex to be the smallest in X
-   
-//     var t = 0;
-//     var r = [];
-
-//     if(a.vertices.length>0){
-      
-//         var min=1e6;
-//         t=0;
-
-//         for(var j in a.vertices){
-//             // for(var i in b.vertices){
-           
-//                 if (a.vertices[j].distanceTo(b)<min){
-//                     min = a.vertices[j].distanceTo(b);
-//                     t=j;
-//                 }
-//             // }
-
-//         }
-//         // console.log(t);
-//         var front = a.vertices.splice(t, Number.MAX_VALUE);
-
-//         while(a.vertices.length>0){
-//             front.push(a.vertices.shift());
-//         }
-//         front.unshift(front[front.length-1].clone())
-//         a.vertices = front;
-//     }
-// }
-
-// function slicesToSpiral(a){
-
-//     var splines = [];
-
-//     for(l in a){
-//         var line = new THREE.SplineCurve3(a[l]);
-//         splines.push(line);
-//     }
-
-//     var steps = 100;
-
-//     var returner = [];
-
-//     for(var s = 1 ; s < splines.length ; s++){
-
-//         var r = [];
-
-//         for(var i = 0 ; i < steps ; i++){
-//             var p1 = splines[s].getPointAt(i/steps);
-//             var p2 = splines[s-1].getPointAt(i/steps);
-//             var p3 = p2.lerp(p1,i/steps);
-//             returner.push(p3);
-//         }
-//         // returner.push(r);
-//     }
-
-//     return returner;
-// }
-
 function makeNurbs(points,det,returnGeom,spaced){
 
     var extrude = extrude || false;
@@ -2017,7 +2070,6 @@ function saveGCode(arr,scalar) {
     var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
     saveAs(blob, name);
 }
-
 
 function saveGCodeMakerbot(arr,scalar) {
 
@@ -2533,12 +2585,9 @@ THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints 
         var point = controlPoints[i];
         this.controlPoints[i] = new THREE.Vector4(point.x, point.y, point.z, point.w);
     }
-
 };
 
-
 THREE.NURBSCurve.prototype = Object.create( THREE.Curve.prototype );
-
 
 THREE.NURBSCurve.prototype.getPoint = function ( t ) {
 
@@ -2599,7 +2648,6 @@ function purgeObject(o){
     o = null;
 };
 
-
 var compareObj = function(a,b){
 
     var returner = true;
@@ -2610,7 +2658,6 @@ var compareObj = function(a,b){
     }
 
     return returner;
-
 }
 
 function duplicateObject(a){
