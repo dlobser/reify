@@ -43,17 +43,6 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, Flower){
   //       var pMat = new THREE.MeshLambertMaterial(  );
   //       this.object = new THREE.Mesh(pGeom,pMat);
 
-        var rData = {
-            squiggle:.5,
-            rope:.5,
-            tower:.5,
-            KB:.5,
-            zig:.5,
-            squares:.5,
-            sprinkles:.5,
-            petals:.5,
-        }
-
         // this.layerHeight = mm in height - .27 is default
         // this.layers = number of slices to lay down;
         // this.gridDetail = number of cells in marching squares (30 is default)
@@ -64,7 +53,7 @@ define(["THREE", "ModelGenerator/Generator"], function(THREE, Flower){
         // this.counterStep = how many gaps to leave between layers (for faster previes)
 
         this.object = new Flower({
-            data:rData,
+            data : parameters,
             layers:200,
             curveDetail:600,
             resampleDetail:600,
