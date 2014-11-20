@@ -37,12 +37,17 @@ function Flower(params){
         this.cells.make();
         // this.cells.makeFaces();
         this.cells.setScale(args.scale);
+        // console.log(this.prnt);
+        // console.log(this.cells.getParent());
+        // this.prnt.add(this.cells.getParent());
         this.userData = this._setValuesFromData(this.processData) || data;
         this.balls.userData = this.userData;
         this.balls.userData.layers = this.layers;
         // this.cells.showBoundary();
+        
         if(!args.balls)
             this._makeBalls();
+
     };
 
     this._setValuesFromData = function(a){
@@ -590,6 +595,9 @@ function Cells(params){
         return lineParent;
     };
 
+    this.getParent = function(){
+        return prnt;
+    }
     this.shiftLineParent = function(amt){
 
         var a = amt || 1;
@@ -682,9 +690,12 @@ function Cells(params){
 
     this.updatePoints = function(ball){
 
+
         for(var p in pnts){
             var c = 0;
             for(var i in ball){
+
+                ball[i].position.x = Math.random();
                 // console.log(ball);
                 var vec = new THREE.Vector3(pnts[p].getX(),pnts[p].getY(),0);
                 // ball[i].parent.updateMatrixWorld();
@@ -1486,12 +1497,6 @@ function saveGCodeMakerbot(arr,scalar) {
     saveAs(blob, name);
 }
 
-Flower.prototype.setScale = function(obj,s){
-    obj.scale.x = s;
-    obj.scale.y = s;
-    obj.scale.z = s;
-}
-
 /**
  * @author renej
  * NURBS utils
@@ -1995,5 +2000,5 @@ function duplicateObject(a){
     return b;
 }
 
-return Flower;
+return null;
 });
