@@ -1,4 +1,4 @@
-define(["THREE", "ModelGenerator/PerlinNoise", "TREE"], function(THREE, noise, TREE){
+define(["THREE", "ModelGenerator/PerlinNoise", "TREE", "fileSaver"], function(THREE, noise, TREE, saveAs){
 
 
 function Flower(params){
@@ -37,17 +37,13 @@ function Flower(params){
         this.cells.make();
         // this.cells.makeFaces();
         this.cells.setScale(args.scale);
-        // console.log(this.prnt);
-        // console.log(this.cells.getParent());
         // this.prnt.add(this.cells.getParent());
         this.userData = this._setValuesFromData(this.processData) || data;
         this.balls.userData = this.userData;
         this.balls.userData.layers = this.layers;
         // this.cells.showBoundary();
-        
         if(!args.balls)
             this._makeBalls();
-
     };
 
     this._setValuesFromData = function(a){
@@ -427,6 +423,7 @@ function Flower(params){
     };
 }
 
+
 function Balls(params){ //line
 
     args = params || {};
@@ -474,16 +471,20 @@ function Balls(params){ //line
 
         var b = this.tree.worldPositionsArray(this.tree.report());
         this.balls = [];
+
         for(i in b){
             for(j in b[i]){
                 var p = b[i][j];
-                var q = new Ball();
+                var q = new Ball({x:p.x,y:p.y});
                 q.parent = this;
-                q.position = p;//new THREE.Vector3(0,0,0);
+                // q.position.x = p.x;//new THREE.Vector3(1,1,0);
+
                 q.rad = p.w;//.04;
                 this.balls.push(q);
             }
         }
+
+        // console.log(this.balls);
 
         this.pUserData = duplicateObject(this.userData);
     }
@@ -598,6 +599,7 @@ function Cells(params){
     this.getParent = function(){
         return prnt;
     }
+
     this.shiftLineParent = function(amt){
 
         var a = amt || 1;
@@ -690,13 +692,9 @@ function Cells(params){
 
     this.updatePoints = function(ball){
 
-
         for(var p in pnts){
             var c = 0;
             for(var i in ball){
-
-                ball[i].position.x = Math.random();
-                // console.log(ball);
                 var vec = new THREE.Vector3(pnts[p].getX(),pnts[p].getY(),0);
                 // ball[i].parent.updateMatrixWorld();
                 // scene.updateMatrixWorld();
@@ -2000,5 +1998,5 @@ function duplicateObject(a){
     return b;
 }
 
-return null;
+return Flower;
 });
