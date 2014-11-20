@@ -1,4 +1,4 @@
-define(["THREE", "ModelGenerator/PerlinNoise", "TREE", "fileSaver"], function(THREE, noise, TREE, saveAs){
+define(["THREE", "ModelGenerator/PerlinNoise", "TREE"], function(THREE, noise, TREE){
 
 
 function Flower(params){

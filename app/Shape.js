@@ -71,7 +71,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
 
 		if(varW){
 			this.object.counterStep = 0;
-			this.object.gridDetail = 100;
+			// this.object.gridDetail = 100;
 	        this.object.makeToolPath();
 	        this.object.turtle();
 			FileUtils.saveGCode([this.object.prnt.children[0].geometry.vertices],this.object.scale)

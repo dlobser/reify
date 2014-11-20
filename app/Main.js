@@ -6,7 +6,6 @@ require.config({
 		"jquery" : "../deps/jquery-2.1.1.min",
 		"THREE" : "../deps/three",
 		"TREE" : "../deps/TREE",
-		"fileSaver" : "../deps/fileSaver",
 		"TERP" : "https://rawgit.com/tambien/TERP/master/TERP",
 		"TWEEN" : "../deps/tween.min",
 		"ModelGenerator" : "../app"
