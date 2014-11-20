@@ -32,9 +32,14 @@ require(["domReady!", "jquery", "ModelGenerator/Shape"], function(ready, $, Shap
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
 	generator.makeShape({
-		"petals" : Math.random(),
-		"noise" : Math.random(),
-		"res"	: 2000
+		squiggle: Math.random(),
+		rope: Math.random(),
+		tower: Math.random(),
+		KB: Math.random(),
+		zig: Math.random(),
+		squares: Math.random(),
+		sprinkles: Math.random(),
+		petals: Math.random(),
 	});
 
 });

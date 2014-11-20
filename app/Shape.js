@@ -45,19 +45,6 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/PerlinNoise"], func
   //       var pMat = new THREE.MeshLambertMaterial(  );
   //       this.object = new THREE.Mesh(pGeom,pMat);
 
-        var rData = {
-            squiggle:.5,
-            rope:1,
-            tower:1,
-            KB:.5,
-            zig:.5,
-            squares:1,
-            sprinkles:1,
-            petals:0,
-        };
-
-
-
         // this.layerHeight = mm in height - .27 is default
         // this.layers = number of slices to lay down;
         // this.gridDetail = number of cells in marching squares (30 is default)
@@ -68,8 +55,8 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/PerlinNoise"], func
         // this.counterStep = how many gaps to leave between layers (for faster previes)
 
         this.object = new Flower({
-            data:rData,
-            layers:100,
+            data : parameters,
+            layers:200,
             curveDetail:600,
             resampleDetail:600,
             scale:35,
