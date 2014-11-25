@@ -1,4 +1,4 @@
-define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], function(THREE, Flower, FileUtils){
+define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitControls", "ModelGenerator/Interface", "ModelGenerator/PerlinNoise"], function(THREE, Flower, FileUtils, OrbitControls, Interface, noise){
 
 	// "use strict";
 
@@ -6,19 +6,69 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
 	 *  setup the three.js environment
 	 */
 	
-	varW = false;
+	varW = varE = varR = varT = varY = var1 = var2 = var3 = var4 = var5 = false;
+
+	var rData = {};
+
+	var c = document.getElementById("myCanvas");
 
 	var ShapeGenerator = function(container, width, height){
+
+		// var imgData = 
+
+		
+
+
 		this.camera = new THREE.PerspectiveCamera( 30, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({alpha : true});
 		this.renderer.setClearColor( 0xffffff , 1);
 		this.renderer.setSize(width, height);
 
+		rData = {
+
+            nothing:0,
+
+            baseCenterScale:0,
+
+            numBalls:.68,
+            bpSize:0,
+            bpLength:0,
+            bpNoisePos:0,
+            bpNoiseAnim:0,
+            bpNoiseOffset:.5,//a.tower*towerMult,
+            bpNoiseScale:0,
+            bpNSFreq:.1,
+            baseTwist:0,
+            bpScaleUp:0,
+            bpTopScale:0,
+            bpBulge:0,
+            
+            tpPetals:.3,
+            tpMult:0,
+            tpLoop:0,
+            tpTwist:0,
+            tpNoiseMult:0,
+            tpNoiseFreq:0,
+            tpFlipFlop:1,
+
+        };
+
+        // rData.imgData = drawSpectrum("myCanvas",[]);
+
+        
+
+
+        Interface.rebuildGui({values:rData,sliders:7});
+
+        rData.bpTopScale = 1;
+        rData.numBalls = .68;
+
 		container.append(this.renderer.domElement);
 
-		this.camera.position.setZ(-60);
+		this.camera.position.setZ(160);
 		this.camera.lookAt(new THREE.Vector3 (0.0, 0.0, 0.0));
+		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement);
 
 		//add light
 		this.scene.add( new THREE.AmbientLight( 0x222222 ) );
@@ -32,19 +82,25 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
 	};
 
 	ShapeGenerator.prototype.makeShape = function(parameters) {
+
+		// drawSpectrum("myCanvas",{})
 		//remove the old shape
 		if (this.object){
 			this.scene.remove(this.object.prnt);
 		}
+
+		// var imgData = drawSpectrum(ctx,[]);
 		
         this.object = new Flower({
-            data : parameters,
+            data : data,
             layers:200,
             curveDetail:600,
             resampleDetail:600,
-            scale:35,
+            scale:75,
             gridDetail:30,
-            counterStep:100
+            counterStep:100,
+            // imgData:imgData,
+            canvas:c
         });
 
 		
@@ -55,6 +111,8 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
         this.object.counterStep = 10;
         this.object.makeToolPath();
         this.object.turtle();
+
+        // this.object.cells.showFaces();
 
         this.scene.add(this.object.prnt);
 
@@ -68,6 +126,8 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
 	ShapeGenerator.prototype.animate = function(){
 
 		requestAnimationFrame(this.animate.bind(this));
+		this.controls.update(10);
+
 
 		if(varW){
 			this.object.counterStep = 0;
@@ -77,13 +137,54 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils"], functi
 			FileUtils.saveGCode([this.object.prnt.children[0].geometry.vertices],this.object.scale)
 			varW=false;
 		}
+		if(varE){
+			this.object.counterStep = 0;
+			// this.object.gridDetail = 100;
+	        this.object.makeToolPath();
+	        this.object.turtle();
+			FileUtils.saveGCodeMakerbot([this.object.prnt.children[0].geometry.vertices],this.object.scale)
+			varE=false;
+		}
+		if(varR){
+			// this.object.counterStep = 0;
+			// this.object.gridDetail = 100;
+	        this.object.makeToolPath();
+	        this.object.turtle();
+	        varR=false;
+		}
+        if(varT){
+        	this.object.drawCanvas(data.var5);
+
+            // console.log(data.var5)
+            this.object.animateBalls();
+        }
+        if(varY){
+            // console.log(count);
+            this.object.turtle();
+        }
+        if(var1){
+        	this.object.counterStep = 0;
+        	console.log(this.object.counterStep)
+
+        	var1=false;
+        }
+        if(var2){
+        	this.object.counterStep = 10;
+        	console.log(this.object.counterStep)
+        	var2=false;
+        }
+        if(var3){
+        	for(k in data){console.log("data.",k,"=",data[k])}
+        	var3=false;
+        }
+
 		if (this.renderer){
 			this.renderer.render( this.scene, this.camera );
 		}
 		if (this.object){
 			// this.object.counter++;
 			// this.object.animateBalls();
-			this.object.prnt.rotateZ(0.01);
+			// this.object.prnt.rotateZ(0.01);
 		}
 	};
 
@@ -117,7 +218,15 @@ function onKeyUp(evt) {
 	if(evt.keyCode == 84 ){ varT = !varT;}
 	if(evt.keyCode == 89 ){ varY = !varY;}
 
+	if(evt.keyCode == 49 ){ var1 = !var1;}
+	if(evt.keyCode == 50 ){ var2 = !var2;}
+	if(evt.keyCode == 51 ){ var3 = !var3;}
+	if(evt.keyCode == 52 ){ var4 = !var4;}
+	if(evt.keyCode == 53 ){ var5 = !var5;}
+
 }
+
+
 
 
 	return ShapeGenerator;
