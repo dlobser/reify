@@ -1,7 +1,9 @@
 
 define(function(){
 
-	function saveGCode(arr,scalar) {
+	function saveGCode(arr,scalar,height) {
+
+		var layerHeight = height || 0.27;
 
 	    var minX = 0;
 	    var minY = 0;
@@ -29,7 +31,7 @@ define(function(){
 
 	    // var output = " \nM73 P0 (enable build progress)\nG21 (set units to mm)\nG90 (set positioning to absolute)\nG10 P1 X-16.5 Y0 Z0 (Designate T0 Offset)\nG55 (Recall offset cooridinate system)\n(**** begin homing ****)\nG162 X Y F2500 (home XY axes maximum)\nG161 Z F1100 (home Z axis minimum)\nG92 Z-5 (set Z to -5)\nG1 Z0.0 (move Z to ÔøΩ0?)\nG161 Z F100 (home Z axis minimum)\nM132 X Y Z A B (Recall stored home offsets for XYZAB axis)\n(**** end homing ****)\nG1 X112 Y-73 Z155 F3300.0 (move to waiting position)\nG130 X0 Y0 A0 B0 (Lower stepper Vrefs while heating)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nM104 S230 T0 (set extruder temperature)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nG130 X127 Y127 A127 B127 (Set Stepper motor Vref to defaults)\nM108 R3.0 T0\nG0 X112 Y-73 (Position Nozzle)\nG0 Z0.2 (Position Height)\nM108 R4.0 (Set Extruder Speed)\nM101 (Start Extruder)\nG4 P1500 (Create Anchor)\n";
 
-	    var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F5000 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
+	    var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F1200 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
 
 	    console.log(MinX);
 	    console.log(MinY);
@@ -44,10 +46,19 @@ define(function(){
 
 	        for(j = 0 ; j < arr[i].length ; j++){
 
+	        	 var vec = arr[i][j];
+
+	        	 var extract = false;
+
+                if(typeof vec.e !== 'undefined'){
+                    if(vec.e==1)
+                        extract = true;
+                }
+
 	            var zed =  arr[i][j].z * scalar;
 	            if(zed<0)
 	                zed=0;
-	            zed+=.3;
+	            zed+=layerHeight;
 
 	            var X = arr[i][j].x * scalar;
 	            var Y = arr[i][j].y * scalar;
@@ -80,7 +91,7 @@ define(function(){
 	                var one = X - pX;
 	                var two = Y - pY;
 	                var dist = Math.sqrt(one*one + two*two);
-	                eValue = .4 * dist * .27;
+	                eValue = .4 * dist * layerHeight;
 
 	            }
 
@@ -94,15 +105,22 @@ define(function(){
 
 	            X+=110;
 	            Y+=110;
-	                
-	            output+="G1 X" + X;
-	            output+=" Y"  + Y;
-	            output+=" Z"  + zed;
-	            output+=" E"  + E;
-	            output+='\n';
 
-	           
-	        }
+	            if(extract){
+                    output+="G0 F9000 X" + X;
+                    output+=" Y"  + Y;
+                    output+=" Z"  + zed;
+                    output+='\n';
+
+                }
+	            else{  
+		            output+="G1 X" + X;
+		            output+=" Y"  + Y;
+		            output+=" Z"  + zed;
+		            output+=" E"  + E;
+		            output+='\n';
+	        	}
+	       	}	
 	          
 	    }
 	    console.log("saved");
@@ -114,7 +132,7 @@ define(function(){
 	function saveGCodeMakerbot(arr,scalar) {
 
 
-	    var output = " \nM73 P0 (enable build progress)\nG21 (set units to mm)\nG90 (set positioning to absolute)\nG10 P1 X-16.5 Y0 Z0 (Designate T0 Offset)\nG55 (Recall offset cooridinate system)\n(**** begin homing ****)\nG162 X Y F2500 (home XY axes maximum)\nG161 Z F1100 (home Z axis minimum)\nG92 Z-5 (set Z to -5)\nG1 Z0.0 (move Z to ÔøΩ0?)\nG161 Z F100 (home Z axis minimum)\nM132 X Y Z A B (Recall stored home offsets for XYZAB axis)\n(**** end homing ****)\nG1 X112 Y-73 Z155 F3300.0 (move to waiting position)\nG130 X0 Y0 A0 B0 (Lower stepper Vrefs while heating)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nM104 S230 T0 (set extruder temperature)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nG130 X127 Y127 A127 B127 (Set Stepper motor Vref to defaults)\nM108 R3.0 T0\nG0 X112 Y-73 (Position Nozzle)\nG0 Z0.2 (Position Height)\nM108 R4.0 (Set Extruder Speed)\nM101 (Start Extruder)\nG4 P1500 (Create Anchor)\n";
+	    var output = " \nM73 P0 (enable build progress)\nG21 (set units to mm)\nG90 (set positioning to absolute)\nG10 P1 X-16.5 Y0 Z0 (Designate T0 Offset)\nG55 (Recall offset cooridinate system)\n(**** begin homing ****)\nG162 X Y F00 (home XY axes maximum)\nG161 Z F1100 (home Z axis minimum)\nG92 Z-5 (set Z to -5)\nG1 Z0.0 (move Z to ÔøΩ0?)\nG161 Z F100 (home Z axis minimum)\nM132 X Y Z A B (Recall stored home offsets for XYZAB axis)\n(**** end homing ****)\nG1 X112 Y-73 Z155 F3300.0 (move to waiting position)\nG130 X0 Y0 A0 B0 (Lower stepper Vrefs while heating)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nM104 S230 T0 (set extruder temperature)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nG130 X127 Y127 A127 B127 (Set Stepper motor Vref to defaults)\nM108 R3.0 T0\nG0 X112 Y-73 (Position Nozzle)\nG0 Z0.2 (Position Height)\nM108 R4.0 (Set Extruder Speed)\nM101 (Start Extruder)\nG4 P1500 (Create Anchor)\n";
 
 
 	    for(var i = 0 ; i < arr.length ; i++){
