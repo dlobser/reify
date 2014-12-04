@@ -2,7 +2,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
     function nGon(params){
 
-        Poly.call(this);
+        Poly.call(this,params);
         var args = params || {};
         this.args = params || {};
         this.closed = true;
@@ -11,8 +11,6 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.detail = args.detail || 1000;
         this.polySize = args.polySize || 1;
 
-        //poly
-        this.sides = args.sides || 3;
     }
 
     Utils.extend(nGon, Poly);
@@ -21,7 +19,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         this.makeSimplePoly();
         this.makeLinearCurve();
-        // this.turtle();
+        this.turtle();
         this.makeObject();
 
         // this.add(new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial()));
@@ -29,42 +27,46 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
     nGon.prototype.turtle = function(){
 
-        // var base = new THREE.Object3D();
-        // var kid = new THREE.Object3D();
-        // base.add(kid);
-        // this.add(base);
+        var base = new THREE.Object3D();
+        var kid = new THREE.Object3D();
+        base.add(kid);
+        this.CTRL.add(base);
 
-        // for(var i = 0 ; i < this.detail ; i++){
+        var verts = [];
 
-        //     var io = i/(this.detail-1);
-        //     var pos = this.linearCurve.getEvenPointAt(io);
-        //     var aim = this.linearCurve.getEvenPointAt(io+0.0001);
-        //     base.position = pos;
+        for(var i = 0 ; i < this.detail ; i++){
 
-        //     base.lookAt(aim);
-        //     base.up = new THREE.Vector3(0,0,1);
+            var io = i/(this.detail-1);
+            var pos = this.linearCurve.getEvenPointAt(io);
+            var aim = this.linearCurve.getEvenPointAt(io+0.0001);
+            base.position = pos;
 
-        //     kid.position.x = Math.sin(pos.cPos*Math.PI*this.args.data.var4*30)*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2)*this.args.data.var2*5;
-        //     kid.position.z = Math.cos(pos.cPos*Math.PI*this.args.data.var4*30)*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2)*this.args.data.var3*5;
+            base.lookAt(aim);
+            base.up = new THREE.Vector3(0,0,1);
 
-        //     var vec = new THREE.Vector3();
-        //     this.updateMatrixWorld();
-        //     base.updateMatrixWorld();
-        //     vec.setFromMatrixPosition(kid.matrixWorld);
-        //     vec.t = pos.cPos;
+            kid.position.x = Math.sin(pos.cPos*Math.PI*this.args.data.var4*30)*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2)*this.args.data.var2*5;
+            kid.position.z = Math.cos(pos.cPos*Math.PI*this.args.data.var4*30)*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2)*this.args.data.var3*5;
 
-        //     if(i===0){
-        //         this.verts[pos.cPos].id = i;
-        //     }
-        //     if(pos.cPos/Math.floor(pos.cPos)==1){
-        //         this.verts[pos.cPos].id = i;
-        //     }
+            var vec = new THREE.Vector3();
+            this.CTRL.updateMatrixWorld();
+            base.updateMatrixWorld();
+            vec.setFromMatrixPosition(kid.matrixWorld);
+            vec.t = pos.cPos;
 
-        //     this.geo.vertices.push(vec);
+            if(i===0){
+                verts["id"+pos.cPos] = i;
+            }
+            if(pos.cPos/Math.floor(pos.cPos)==1){
+                verts["id"+pos.cPos] = i;
+            }
 
-        // }
+            verts.push(vec);
 
-        // this.remove(base);
+        }
+        this.geo.vertices = verts;
+
+
+        this.CTRL.remove(base);
 
     };
 
@@ -76,11 +78,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                     Math.sin(i/this.sides*Math.PI*2)*this.polySize,
                     this.polySize-Math.cos(i/this.sides*Math.PI*2)*this.polySize,
                     0);
-            this.verts.push(vec);
+            this.cVerts.push(vec);
         }
     };
 
-    nGon.prototype.dispose = function(obj,scene){
+    // nGon.prototype.dispose = function(obj,scene){
         // if(this.children){
         //     var that = this;
         //     this.traverse(function(obj){
@@ -99,7 +101,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         // // if(obj.material)
         //         this.Line.material.dispose();
 
-    };
+    // };
 
     return nGon;
 });

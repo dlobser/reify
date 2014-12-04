@@ -37,36 +37,45 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 				// this.makeShape();
 
 		this.animate();
-		this.count = 0;
+		this.counter = 0;
 	};
 
 	ShapeGenerator.prototype.makeShape = function(parameters) {
+
+		this.counter++;
+
 		if(typeof this.object !== 'undefined'){
 			// this.object.dispose();
 			this.object.traverse(function(obj){
+				// console.log(obj);
 				if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
 	                obj.geometry.dispose();
 	                obj.material.dispose();
 	            }
 	            if(obj.parent)
-	            obj.parent.remove(obj);
-	            obj = null;
+	            	obj.parent.remove(obj);
+	            // obj = null;
 			})
 		}
-        this.object = new Phalanx({data:data,amount:2,layers:12,polySize:30,detail:500});
+		if(typeof p !== 'undefined'){
+			p.dispose();
+		}
+        var p = new Phalanx({data:data,amount:1,layers:200,polySize:30,detail:500});
+        this.object = p.init();
         // this.object = new nGon({data:data});
-        this.object.init();
-        
+        // this.object.init();
+        // console.log(this.object);
         this.scene.add(this.object);
 	};
 
 	ShapeGenerator.prototype.animate = function(){
+					requestAnimationFrame(this.animate.bind(this));
+			this.controls.update(10);
+			this.renderer.render( this.scene, this.camera );
+
 
 		if(varR){
-			requestAnimationFrame(this.animate.bind(this));
-			this.controls.update(10);
 			this.makeShape();
-			this.renderer.render( this.scene, this.camera );
 		}
 
 		if(var4){
