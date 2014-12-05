@@ -11,6 +11,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.layerHeight = args.layerHeight || .27;
         this.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
 
+        this.song = args.song || [];
+        this.songCurve = new Utils.linearCurve(Utils.arrayToVecs(this.song));
+
+        this.args.songCurve = this.songCurve;
+
         this.CTRL = new THREE.Object3D();
 
         this.geo = new THREE.Geometry();
@@ -20,6 +25,14 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         this.counter = args.counter || 0;
         this.args.counter = 0;
+
+        this.updateFrequency = 5;
+
+        this._currentLayer = 0;
+        this._layerStep = 10;
+        this.nGons = [];
+
+        this.drawFinished = false;
         // this.CTRL.add(this.Line);
 
     }
@@ -27,18 +40,29 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
     Phalanx.prototype.init = function(){
 
-        this.nGons = [];
-        for(var j = 0 ; j < this.layers ; j++){
+        var j = this._currentLayer;
+
+        while(j < this._currentLayer + this._layerStep){
+            this.args.counter++;
             for(var i = 0 ; i < this.amount ; i++){
-                this.args.counter++;
+                
                 var NG = new CastnGon(this.args);
-                this.nGons.push(NG);
+
+                if(typeof this.nGons[i+j*this.amount] !== 'undefined')
+                    if(typeof this.nGons[i+j*this.amount].Curve !== 'undefined')
+                        this.nGons[i+j*this.amount].dispose();
+
+                this.nGons[i+j*this.amount] = (NG);
                 // console.log(NG.testVariable);
                 // var NG = this.CastnGons[this.nGons.length-1];
-                // if(i==0)
-                // NG.CTRL.rotation.z = i/this.amount * Math.PI*2 +j*.02+i;
-                // else
-                // NG.CTRL.rotation.z = i/this.amount * Math.PI*2 +j*.02+-i;
+                if(i==0)
+                    NG.CTRL.rotation.z = 0;
+                else
+                    NG.CTRL.rotation.z = Math.PI;
+
+                // NG.CTRL.position.x = i*10;
+
+                // console.log(NG.CTRL.position.x);
 
                 NG.CTRL.position.z = j*this.layerHeight;
                 NG.init(this.args);
@@ -47,33 +71,80 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 // NG.dispose(NG,this);
 
             }
+            j++;
         }
+
+        // console.log(this._currentLayer);
+        this._currentLayer += this._layerStep;
+
+        if(this._currentLayer+this._layerStep > this.layers){
+            this._currentLayer = 0;
+            this.args.counter = 0;
+            this.drawFinished = true;
+        }
+        else
+            this.drawFinished = false;
+
+
+        // processLargeArray(this.nGons,this.Curve);
+
         return this.Curve;
     };
 
-    // Phalanx.prototype.dispose = function(){
-        
-    //     var that = this;
-    //     this.traverse(function(obj){
-    //         if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
-    //             obj.geometry.dispose();
-    //             obj.material.dispose();
+    // Phalanx.prototype.update = function
+
+    // function processLargeArray(array,parent) {
+    //     // set this to whatever number of items you can process at once
+    //     var chunk = 5;
+    //     var index = 0;
+
+    //     function doChunk() {
+
+    //         var cnt = chunk;
+
+    //         while (cnt-- && index < array.length) {
+    //             // process array[index] here
+    //             parent.add(array[index].init());
+    //             ++index;
     //         }
-    //         // that.remove(obj);
-    //         obj = null;
-    //     });
-    //     if(this.Line.geometry)
-    //             this.Line.geometry.dispose();
-    //     if(this.Line.material)
-    //             this.Line.material.dispose();
-
-    //     this.Line=null;
-
-    //     for(var i in this.nGons){
-    //         this.nGons[i].dispose(this.nGons[i],this);
-    //         this.nGons[i] = null;
+    //         if (index < array.length) {
+    //             // set Timeout for async iteration
+    //             setTimeout(doChunk, 1);
+    //         }
     //     }
+
+    //     doChunk();    
     // }
+
+   
+
+    Phalanx.prototype.dispose = function(){
+
+        this.nGons.forEach(function(o){obj.dispose();});
+        this.nGons = null;
+
+        
+        // var that = this;
+        // this.traverse(function(obj){
+        //     if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
+        //         obj.geometry.dispose();
+        //         obj.material.dispose();
+        //     }
+        //     // that.remove(obj);
+        //     obj = null;
+        // });
+        // if(this.Line.geometry)
+        //         this.Line.geometry.dispose();
+        // if(this.Line.material)
+        //         this.Line.material.dispose();
+
+        // this.Line=null;
+
+        // for(var i in this.nGons){
+        //     this.nGons[i].dispose(this.nGons[i],this);
+        //     this.nGons[i] = null;
+        // }
+    }
 
 
     return Phalanx;

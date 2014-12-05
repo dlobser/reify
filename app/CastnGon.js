@@ -7,11 +7,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.args = params || {};
         this.closed = true;
         this.args.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
-        this.sides = 3 + Math.floor(this.args.data.var5*10);
+        this.sides = 3 + Math.floor(this.args.data.bpSides*15);
         this.detail = args.detail || 1000;
         this.polySize = args.polySize || 1;
 
-        this.castObject = args.castObject || new THREE.Mesh(new THREE.BoxGeometry(this.polySize,this.polySize,this.polySize),this.mat);
+        this.castObject = args.castObject || new THREE.Mesh(new THREE.BoxGeometry(this.polySize,this.polySize,this.polySize),new THREE.MeshLambertMaterial(  ));
 
         this.caster = new THREE.Raycaster();
 
@@ -24,10 +24,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
     CastnGon.prototype.init = function(params){
 
         this.makeSimplePoly();
-        this.makeLinearCurve();
+        this.makeCurve();
         this.turtle();
         this.makeObject();
 
+        return this.Curve;
         // this.add(new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial()));
     };
 
@@ -42,16 +43,44 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         for(var i = 0 ; i < this.detail ; i++){
 
-            var io = i/(this.detail-1);
-            var pos = this.linearCurve.getEvenPointAt(io);
-            var aim = this.linearCurve.getEvenPointAt(io+0.0001);
+            var io = i/(this.detail);
+
+            var pos,aim;
+
+            if(this.curveType == "linear"){
+                pos = this.path.getEvenPointAt(io);
+                aim = this.path.getEvenPointAt(io+0.000000001);
+            }
+            else{
+                pos = this.path.getPointAt(io);
+                offPos = io+0.000000001;
+                if(offPos>1)
+                    offPos=0;
+                aim = this.path.getPointAt(offPos);
+            }
+            // console.log(io);
+
+            if(typeof pos.cPos == 'undefined')
+                pos.cPos = io*this.cVerts.length;
+
             base.position = pos;
 
             base.lookAt(aim);
             base.up = new THREE.Vector3(0,0,1);
 
-            kid.position.x = Math.sin(pos.cPos*Math.PI*this.args.data.var4*30)*this.args.data.var2*5*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2);
-            kid.position.z = Math.cos(pos.cPos*Math.PI*this.args.data.var4*30)*this.args.data.var3*5*((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2);
+            var sinMult = (this.args.data.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
+
+            // console.log(this.args.songCurve.getPointAt(this.counter/this.args.layers));
+
+            kid.position.x = Math.sin((this.counter*this.args.data.tpTwist)+
+                pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
+                (this.args.data.tpMult + sinMult)*5*Math.max((1+this.args.data.tpCornerMult),
+                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+
+            kid.position.z = Math.cos((this.counter*this.args.data.tpTwist)+
+                pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
+                (this.args.data.tpLoop )*5*Math.max((1+this.args.data.tpCornerMult),
+                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             var vec = new THREE.Vector3();
             this.CTRL.updateMatrixWorld();
@@ -83,7 +112,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         for(var i = 0 ; i < this.sides ; i++){
 
-            var c = 0;// this.counter*.01;
+            var c = this.args.data.bpTwist*this.counter*.01;// this.counter*.01;
 
             var vec = new THREE.Vector3(
                     Math.sin(c+(i/this.sides*Math.PI*2))*1e6,
@@ -94,10 +123,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            this.castObject.rotation.x=this.counter*.01;
-            this.castObject.rotation.y=this.counter*.01;
-            this.castObject.rotation.z=this.counter*.01;
-            this.castObject.position.z=this.counter*.06;//Math.sin(this.counter*.1)*5;
+
+            this.castObject.rotation.x=this.args.data.cbTwistX*this.counter*.1;
+            this.castObject.rotation.y=this.args.data.cbTwistY*this.counter*.1;
+            this.castObject.rotation.z=this.args.data.cbTwistZ*this.counter*.1;
+            this.castObject.position.z=Math.sin(this.counter*this.args.data.bpSize)*20*this.args.data.cbTwist;
 
             this.castObject.updateMatrixWorld();
 
@@ -131,6 +161,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.castObject.geometry = null;
         this.castObject.material.dispose();
         this.castObject.material = null;
+        this.castObject = null;
         this.caster = null;
 
         // if(this.children){

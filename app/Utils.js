@@ -3,168 +3,186 @@ define(["THREE"],function(THREE){
 	return {
 
 		linearCurve:function(vecs,closed){
-		    
-		    //points to return
-		    this.points = [];
+			
+			//points to return
+			this.points = [];
 
-		    var close = closed ? true:false;
+			var close = closed ? true:false;
 
-		    //one dimensional array of vectors
-		    this.vecs = vecs || [];
+			//one dimensional array of vectors
+			this.vecs = vecs || [];
 
-		    if(close)
-		        this.vecs.push(this.vecs[0].clone());
+			if(close)
+				this.vecs.push(this.vecs[0].clone());
 
-		    //total length
-		    this.lineLength = 0;
-		    
-		    for(var i = 0 ; i < this.vecs.length ; i++){
-		        if(i>0){
-		            this.vecs[i-1].dist = this.vecs[i-1].distanceTo(this.vecs[i]);
-		        }
-		    }
-		    
-		    this.getLength = function(){
-		        for(var i = 0 ; i < this.vecs.length-1 ; i++){
-		           this.lineLength+=this.vecs[i].dist;
-		        }
-		        return this.lineLength;
-		    };
-		    
-		    this.lineLength = this.getLength();
+			//total length
+			this.lineLength = 0;
+			
+			for(var i = 0 ; i < this.vecs.length ; i++){
+				if(i>0){
+					this.vecs[i-1].dist = this.vecs[i-1].distanceTo(this.vecs[i]);
+				}
+			}
+			
+			this.getLength = function(){
+				for(var i = 0 ; i < this.vecs.length-1 ; i++){
+				   this.lineLength+=this.vecs[i].dist;
+				}
+				return this.lineLength;
+			};
+			
+			this.lineLength = this.getLength();
 
-		    this.getSpacedPoints = function(amt){
+			this.getSpacedPoints = function(amt){
 
-		        this.points = [];
+				this.points = [];
 
-		        var len = this.lineLength;
-		                
-		        for(var i = 0 ; i < this.vecs.length-1 ; i++){
-		            for(var j = 0 ; j < (this.vecs[i].dist/len)*amt ; j++){
-		                var v = this.vecs[i].clone();
-		                v.lerp(this.vecs[i+1],j/((this.vecs[i].dist/len)*amt));
-		                this.points.push(v);
-		            }
-		        }
-		        return this.points;
-		    };
-		    
-		    this.getEvenPoints = function(amt){
+				var len = this.lineLength;
+						
+				for(var i = 0 ; i < this.vecs.length-1 ; i++){
+					for(var j = 0 ; j < (this.vecs[i].dist/len)*amt ; j++){
+						var v = this.vecs[i].clone();
+						v.lerp(this.vecs[i+1],j/((this.vecs[i].dist/len)*amt));
+						this.points.push(v);
+					}
+				}
+				return this.points;
+			};
+			
+			this.getEvenPoints = function(amt){
 
-		        this.points = [];
-		        
-		        var len = this.lineLength;
-		        
-		        console.log(this.vecs[0].dist/len);
-		        
-		        for(var i = 0 ; i < this.vecs.length-1 ; i++){
-		            for(var j = 0 ; j < amt ; j++){
-		                var v = this.vecs[i].clone();
-		                v.lerp(this.vecs[i+1],j/amt);
-		                this.points.push(v);
-		            }
-		        }
-		        return this.points;
-		    };
-		    
-		    //points are spaced evenly across the entire curve
-		    this.getPointAt = function(t){
+				this.points = [];
+				
+				var len = this.lineLength;
+				
+				console.log(this.vecs[0].dist/len);
+				
+				for(var i = 0 ; i < this.vecs.length-1 ; i++){
+					for(var j = 0 ; j < amt ; j++){
+						var v = this.vecs[i].clone();
+						v.lerp(this.vecs[i+1],j/amt);
+						this.points.push(v);
+					}
+				}
+				return this.points;
+			};
+			
+			//points are spaced evenly across the entire curve
+			this.getPointAt = function(t){
 
-		        if(t>1)
-		            t=1;
-		        if(t<0)
-		            t=0;
+				if(t>1)
+					t=1;
+				if(t<0)
+					t=0;
 
-		        var total = 0;
-		        for(var i = 0 ; i < this.vecs.length-1 ;){
-		            if(total+this.vecs[i].dist<t*this.lineLength){ total+=this.vecs[i].dist;i++;}
-		            else{
-		                thisT2 = THREE.Math.mapLinear(t*this.lineLength,total,total+this.vecs[i].dist,0,1);
-		                var v = this.vecs[i].clone();
-		                v.lerp(this.vecs[i+1],thisT2);
-		                v.cPos = total+(thisT2*vecs[i].dist);
-		                return v;
-		               
-		            }
-		        }
-		    };
+				var total = 0;
+				for(var i = 0 ; i < this.vecs.length-1 ;){
+					if(total+this.vecs[i].dist<t*this.lineLength){ total+=this.vecs[i].dist;i++;}
+					else{
+						thisT2 = THREE.Math.mapLinear(t*this.lineLength,total,total+this.vecs[i].dist,0,1);
+						var v = this.vecs[i].clone();
+						v.lerp(this.vecs[i+1],thisT2);
+						v.cPos = total+(thisT2*vecs[i].dist);
+						return v;
+					   
+					}
+				}
+			};
 
-		    //points are spaced equally between vertices
-		    this.getEvenPointAt = function(t){
+			//points are spaced equally between vertices
+			this.getEvenPointAt = function(t){
 
-		        if(t>1)
-		            t=1;
-		        if(t<0)
-		            t=0;
+				if(t>1)
+					t=1;
+				if(t<0)
+					t=0;
 
-		        var t2=t*(this.vecs.length-1);
-		        
-		        var total = 0;
-		        for(var i = 1 ; i < this.vecs.length ;){
-		            if(total+1<t2){total+=1;i++;}
-		            else{
-		                thisT2 = THREE.Math.mapLinear(t2,total,total+1,0,1);
-		                var v = this.vecs[i-1].clone();
-		                v.lerp(this.vecs[i],thisT2);
-		                v.cPos = total+thisT2;
-		                return v;
-		               
-		            }
-		        }
-		        
-		    };
+				var t2=t*(this.vecs.length-1);
+				
+				var total = 0;
+				for(var i = 1 ; i < this.vecs.length ;){
+					if(total+1<t2){total+=1;i++;}
+					else{
+						thisT2 = THREE.Math.mapLinear(t2,total,total+1,0,1);
+						var v = this.vecs[i-1].clone();
+						v.lerp(this.vecs[i],thisT2);
+						v.cPos = total+thisT2;
+						return v;
+					   
+					}
+				}
+				
+			};
 		},
+
+
+	    arrayToVecs:function(arr){
+
+	    	var r = [];
+
+	    	for(var i = 0 ; i < arr.length ; i++){
+	    		r.push(new THREE.Vector3(i,arr[i],0));
+	    	}
+	        
+	        return r;
+	    },
+
+	    JSONSongToCurves:function(obj){
+	    	this.songCurves = [];
+
+
+	    },
 
 		Wave:function(){
 
-		    this.cosPoints = [
-		        new THREE.Vector3(0,-1,0),
-		        new THREE.Vector3(Math.PI,1,0),
-		        new THREE.Vector3(Math.PI*2,-1,0),
-		    ];
-		    this.sinPoints = [
-		        new THREE.Vector3(0,0,0),
-		        new THREE.Vector3(Math.PI/2,1,0),
-		        new THREE.Vector3(Math.PI,0,0),
-		        new THREE.Vector3((3/2)*Math.PI,-1,0),
-		        new THREE.Vector3(Math.PI*2,0,0),
-		    ];
-		    this.squarePoints = [
-		        new THREE.Vector3(0,-1,0),
-		        new THREE.Vector3(0,1,0),
-		        new THREE.Vector3(Math.PI,1,0),
-		        new THREE.Vector3(Math.PI,-1,0),
-		        new THREE.Vector3(Math.PI*2,-1,0),
-		    ];
+			this.cosPoints = [
+				new THREE.Vector3(0,-1,0),
+				new THREE.Vector3(Math.PI,1,0),
+				new THREE.Vector3(Math.PI*2,-1,0),
+			];
+			this.sinPoints = [
+				new THREE.Vector3(0,0,0),
+				new THREE.Vector3(Math.PI/2,1,0),
+				new THREE.Vector3(Math.PI,0,0),
+				new THREE.Vector3((3/2)*Math.PI,-1,0),
+				new THREE.Vector3(Math.PI*2,0,0),
+			];
+			this.squarePoints = [
+				new THREE.Vector3(0,-1,0),
+				new THREE.Vector3(0,1,0),
+				new THREE.Vector3(Math.PI,1,0),
+				new THREE.Vector3(Math.PI,-1,0),
+				new THREE.Vector3(Math.PI*2,-1,0),
+			];
 
-		    this.cosCurve = new linearCurve(this.cosPoints);
-		    this.sinCurve = new linearCurve(this.sinPoints);
-		    this.squareCurve = new linearCurve(this.squarePoints);
+			this.cosCurve = new linearCurve(this.cosPoints);
+			this.sinCurve = new linearCurve(this.sinPoints);
+			this.squareCurve = new linearCurve(this.squarePoints);
 
-		    this.TriCos = function(t){
+			this.TriCos = function(t){
 
-		        return this.cosCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
+				return this.cosCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
 
-		    };
+			};
 
-		    this.TriSin = function(t){
+			this.TriSin = function(t){
 
-		        return this.sinCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
+				return this.sinCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
 
-		    };
+			};
 
-		    this.Square = function(t){
+			this.Square = function(t){
 
-		        return this.squareCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
+				return this.squareCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
 
-		    }
+			}
 		},
 
 		extend:function(child, parent){
-		    function TmpConst(){}
-		    TmpConst.prototype = parent.prototype;
-		    child.prototype = new TmpConst();
-		    child.prototype.constructor = child;
+			function TmpConst(){}
+			TmpConst.prototype = parent.prototype;
+			child.prototype = new TmpConst();
+			child.prototype.constructor = child;
 		},
 
 		arraysEqual:function(a, b) {
