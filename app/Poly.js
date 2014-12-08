@@ -11,9 +11,15 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function
         this.cVerts = [];
         this.path = null;
         this.curveType = args.curveType || "linear";
+        this.id = params.id || 0;
 
         this.CTRL = new THREE.Object3D();
-        this.CTRL.add(this.Curve);
+        this.CTRL1 = new THREE.Object3D();
+        this.CTRL2 = new THREE.Object3D();
+
+        this.CTRL.add(this.CTRL1);
+        this.CTRL1.add(this.CTRL2);
+        this.CTRL2.add(this.Curve);
 
         this.geo = new THREE.Geometry();
         this.mat = args.material || new THREE.LineBasicMaterial( );

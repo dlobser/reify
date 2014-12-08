@@ -18,6 +18,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         this.CTRL = new THREE.Object3D();
 
+        this.ctrls = [];
+
         this.geo = new THREE.Geometry();
         this.mat = new THREE.LineBasicMaterial();
 
@@ -45,14 +47,23 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         while(j < this._currentLayer + this._layerStep){
             this.args.counter++;
             for(var i = 0 ; i < this.amount ; i++){
-                
+
+                // if(typeof this.ctrls[i]=='undefined')
+                //     this.ctrls[i] = new THREE.Object3D();
+
+                this.args.id = i+1;
+                this.args.data = this.data[i+1];
+
                 var NG = new CastnGon(this.args);
+
+                // this.ctrls[i].add(NG.CTRL);
 
                 if(typeof this.nGons[i+j*this.amount] !== 'undefined')
                     if(typeof this.nGons[i+j*this.amount].Curve !== 'undefined')
                         this.nGons[i+j*this.amount].dispose();
 
                 this.nGons[i+j*this.amount] = (NG);
+
                 // console.log(NG.testVariable);
                 // var NG = this.CastnGons[this.nGons.length-1];
                 if(i==0)
@@ -60,9 +71,9 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 else
                     NG.CTRL.rotation.z = Math.PI;
 
-                // NG.CTRL.position.x = i*10;
+                NG.CTRL.rotation.z += this.data[0].twist * j *.01;
 
-                // console.log(NG.CTRL.position.x);
+                NG.CTRL2.position.y = 1+(this.data[0].offset*100);
 
                 NG.CTRL.position.z = j*this.layerHeight;
                 NG.init(this.args);

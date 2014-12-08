@@ -48,7 +48,44 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
         };
 
-        Interface.rebuildGui({values:rData,sliders:7});
+        coreValues = function(n){
+        	return {name:n,values:{
+                nothing:0,
+	            bpSides:.68,
+	            bpSize:0,
+	            bpTwist:0,
+	            cbTwist:0,
+	            cbTwistX:0,
+	            cbTwistY:0,
+	            cbTwistZ:0,
+	            tpPetals:.3,
+	            tpMult:0,
+	            tpLoop:0,
+	            tpTwist:0,
+	            tpCornerMult:0,
+	            songMult:0,
+        	}};
+        }
+
+        var buildObject = {
+        	sliders:0.1,
+        	folders:[],
+        };
+
+        var amt = 2;
+
+        buildObject.folders.push({name:"base",values:{
+                twist:0,
+                offset:0,
+        	}})
+
+        for(var i = 0 ; i < amt ; i++){
+        	buildObject.folders.push(new coreValues("core"+i))
+        }
+
+        Interface.rebuildGui(buildObject);
+
+        // Interface.rebuildGui({values:rData,sliders:7});
 
 
 		this.camera = new THREE.PerspectiveCamera( 30, width / height, 1, 20000 );
@@ -73,10 +110,24 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 		this.objects = [];
 
+		var passInfo = [];
+
+		var i = 0 ;
+		for(var k in info){
+			passInfo[i] = info[k];
+			i++;
+		}
+
+		// console.log
+		// passInfo[0] = info.core0;
+		// passInfo[1] = info.core1;
+
+		// console.log(passInfo);
+
 		// var sp = new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial(  ));
 		// this.scene.add(sp);
 				// this.makeShape();
-		this.p = new Phalanx({data:data,amount:1,curveType:"linear",layers:1000,polySize:50,detail:500, song:Songs.song});
+		this.p = new Phalanx({data:passInfo,amount:2,curveType:"linear",layers:100,polySize:50,detail:500, song:Songs.song});
 		this.animate();
 		this.counter = 0;
 

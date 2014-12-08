@@ -14,7 +14,6 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.castObject = args.castObject || new THREE.Mesh(new THREE.BoxGeometry(this.polySize,this.polySize,this.polySize),new THREE.MeshLambertMaterial(  ));
 
         this.caster = new THREE.Raycaster();
-
         // this.counter = args.counter || 0;
 
     }
@@ -37,7 +36,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         var base = new THREE.Object3D();
         var kid = new THREE.Object3D();
         base.add(kid);
-        this.CTRL.add(base);
+        this.CTRL2.add(base);
 
         var verts = [];
 
