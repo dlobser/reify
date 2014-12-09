@@ -1,6 +1,22 @@
-define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitControls", "ModelGenerator/Interface", "ModelGenerator/PerlinNoise", "ModelGenerator/Phalanx", "ModelGenerator/nGon", "ModelGenerator/Songs"], function(THREE, Flower, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs){
+define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitControls", "ModelGenerator/Interface", "ModelGenerator/PerlinNoise", "ModelGenerator/Phalanx", "ModelGenerator/nGon", "ModelGenerator/Songs", "ModelGenerator/UI"], function(THREE, Flower, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs, UI){
 
+	// require(["ModelGenerator/UI"]);
 	// "use strict";
+	console.log(Interface.UI);
+	var c = [];
+	var q=-1;
+	for(var i = 0 ; i < 6 ; i++){
+		c[++q] = 75;
+		c[++q] = (i/5)*150;
+		c[++q] = 0;
+
+
+	}
+	var ui = new Interface.UI({res:150,setCtrl:c});
+	// ui.init();
+	// ui.background();
+	ui.animate();
+	// ui.drawVectors();
 
 	/**
 	 *  setup the three.js environment
@@ -10,6 +26,8 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 	var4 = var3 = varW = false;
 
 	var ShapeGenerator = function(container, width, height){
+
+		var amt = 1;
 
 		rData = {
 
@@ -51,7 +69,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
         coreValues = function(n){
         	return {name:n,values:{
                 nothing:0,
-	            bpSides:.68,
+	            bpSides:0,
 	            bpSize:0,
 	            bpTwist:0,
 	            cbTwist:0,
@@ -72,14 +90,13 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
         	folders:[],
         };
 
-        var amt = 2;
-
         buildObject.folders.push({name:"base",values:{
                 twist:0,
                 offset:0,
         	}})
 
         for(var i = 0 ; i < amt ; i++){
+        	buildObject.folders[0].values["twist"+i]=0;
         	buildObject.folders.push(new coreValues("core"+i))
         }
 
@@ -117,6 +134,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 			passInfo[i] = info[k];
 			i++;
 		}
+		passInfo[1].arrayData = ui.getVecs();
 
 		// console.log
 		// passInfo[0] = info.core0;
@@ -127,7 +145,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 		// var sp = new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial(  ));
 		// this.scene.add(sp);
 				// this.makeShape();
-		this.p = new Phalanx({data:passInfo,amount:2,curveType:"linear",layers:100,polySize:50,detail:500, song:Songs.song});
+		this.p = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:100,polySize:20,detail:500, song:Songs.song});
 		this.animate();
 		this.counter = 0;
 
@@ -164,9 +182,14 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 	};
 
 	ShapeGenerator.prototype.animate = function(){
-			requestAnimationFrame(this.animate.bind(this));
-			this.controls.update(10);
-			this.renderer.render( this.scene, this.camera );
+		requestAnimationFrame(this.animate.bind(this));
+		this.controls.update(10);
+		this.renderer.render( this.scene, this.camera );
+		// console.log(this.p);
+		this.p.data[1].arrayData = ui.getVecs();
+		// ui.background();
+		// 	ui.drawVectors();
+
 
 
 		if(varR){

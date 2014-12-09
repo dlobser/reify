@@ -7,7 +7,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.args = params || {};
         this.closed = true;
         this.args.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
-        this.sides = 3 + Math.floor(this.args.data.bpSides*15);
+        this.sides = Math.max(3,3 + Math.floor(this.args.data.bpSides*15));
         this.detail = args.detail || 1000;
         this.polySize = args.polySize || 1;
 
@@ -15,6 +15,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         this.caster = new THREE.Raycaster();
         // this.counter = args.counter || 0;
+        // console.log(this.args);
 
     }
 
@@ -42,7 +43,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         for(var i = 0 ; i < this.detail ; i++){
 
-            var io = i/(this.detail);
+            var io = i/(this.detail-1);
 
             var pos,aim;
 
@@ -69,16 +70,19 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
             var sinMult = (this.args.data.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
 
-            // console.log(this.args.songCurve.getPointAt(this.counter/this.args.layers));
+            var arrayMult = this.args.data.arrayData.getPointAt(this.args.offset/this.args.layers).x;
 
-            kid.position.x = Math.sin((this.counter*this.args.data.tpTwist)+
+
+            kid.position.x = arrayMult*Math.sin((this.counter*this.args.data.tpTwist)+
                 pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
-                (this.args.data.tpMult + sinMult)*5*Math.max((1+this.args.data.tpCornerMult),
+                (this.args.data.tpMult + sinMult)*5*
+                Math.max((1+this.args.data.tpCornerMult),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
-            kid.position.z = Math.cos((this.counter*this.args.data.tpTwist)+
+            kid.position.z = arrayMult*Math.cos((this.counter*this.args.data.tpTwist)+
                 pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
-                (this.args.data.tpLoop )*5*Math.max((1+this.args.data.tpCornerMult),
+                (this.args.data.tpLoop )*5*
+                Math.max((1+this.args.data.tpCornerMult),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             var vec = new THREE.Vector3();

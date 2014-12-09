@@ -52,6 +52,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 //     this.ctrls[i] = new THREE.Object3D();
 
                 this.args.id = i+1;
+                this.args.offset = j;
+                this.args.layers = this.layers;
                 this.args.data = this.data[i+1];
 
                 var NG = new CastnGon(this.args);
@@ -66,12 +68,10 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
                 // console.log(NG.testVariable);
                 // var NG = this.CastnGons[this.nGons.length-1];
-                if(i==0)
-                    NG.CTRL.rotation.z = 0;
-                else
-                    NG.CTRL.rotation.z = Math.PI;
+                NG.CTRL.rotation.z = (i/this.amount)*Math.PI*2;
 
                 NG.CTRL.rotation.z += this.data[0].twist * j *.01;
+                NG.CTRL.rotation.z += this.data[0]["twist"+i] * j* .01;
 
                 NG.CTRL2.position.y = 1+(this.data[0].offset*100);
 
