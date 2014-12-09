@@ -14,6 +14,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.castObject = args.castObject || new THREE.Mesh(new THREE.BoxGeometry(this.polySize,this.polySize,this.polySize),new THREE.MeshLambertMaterial(  ));
 
         this.caster = new THREE.Raycaster();
+
+        this.wave = new Utils.Wave();
         // this.counter = args.counter || 0;
         // console.log(this.args);
 
@@ -39,6 +41,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         base.add(kid);
         this.CTRL2.add(base);
 
+        var aData = this.args.data;
+
         var verts = [];
 
         for(var i = 0 ; i < this.detail ; i++){
@@ -47,17 +51,21 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
             var pos,aim;
 
-            if(this.curveType == "linear"){
-                pos = this.path.getEvenPointAt(io);
-                aim = this.path.getEvenPointAt(io+0.000000001);
-            }
-            else{
-                pos = this.path.getPointAt(io);
-                offPos = io+0.000000001;
-                if(offPos>1)
-                    offPos=0;
-                aim = this.path.getPointAt(offPos);
-            }
+            var off = .00000001;
+            if(io+off>1)
+                off=0;
+
+            // if(this.curveType == "linear"){
+            pos = this.getPointAt(io,aData.linearSpline);//this.linearCurve.getEvenPointAt(io,aData.nothing).lerp(this.splineCurve.getPointAt(io),aData.nothing);
+            aim = this.getPointAt(io+off,aData.linearSpline);//this.linearCurve.getEvenPointAt(io+off,aData.nothing).lerp(this.splineCurve.getPointAt(io+off),aData.nothing);
+            // }
+            // else{
+            //     pos = this.path.getPointAt(io);
+            //     offPos = io+0.000000001;
+            //     if(offPos>1)
+            //         offPos=0;
+            //     aim = this.path.getPointAt(offPos);
+            // }
             // console.log(io);
 
             if(typeof pos.cPos == 'undefined')
@@ -68,21 +76,28 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
             base.lookAt(aim);
             base.up = new THREE.Vector3(0,0,1);
 
-            var sinMult = (this.args.data.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
+            var sinMult = (aData.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
 
-            var arrayMult = this.args.data.arrayData.getPointAt(this.args.offset/this.args.layers).x;
+            var arrayMult = 1;//aData.arrayData.getPointAt(this.args.offset/this.args.layers).x;
 
-
-            kid.position.x = arrayMult*Math.sin((this.counter*this.args.data.tpTwist)+
-                pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
-                (this.args.data.tpMult + sinMult)*5*
-                Math.max((1+this.args.data.tpCornerMult),
+            var veca = arrayMult*Math.sin((this.counter*Utils.remap(aData.tpTwist))+
+                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+                (Utils.remap(aData.tpMult) + sinMult)*5*
+                Math.max((.5+Utils.remap(aData.tpCornerMult)),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
-            kid.position.z = arrayMult*Math.cos((this.counter*this.args.data.tpTwist)+
-                pos.cPos*Math.PI*2*(Math.floor(this.args.data.tpPetals*30)))*
-                (this.args.data.tpLoop )*5*
-                Math.max((1+this.args.data.tpCornerMult),
+            var vecb = arrayMult*this.wave.TriSin((this.counter*Utils.remap(aData.tpTwist))+
+                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+                (Utils.remap(aData.tpMult) + sinMult)*5*
+                Math.max((.5+Utils.remap(aData.tpCornerMult)),
+                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+
+            kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
+
+            kid.position.z = arrayMult*Math.cos((this.counter*Utils.remap(aData.tpTwist))+
+                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+                (Utils.remap(aData.tpLoop) )*5*
+                Math.max((.5+Utils.remap(aData.tpCornerMult)),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             var vec = new THREE.Vector3();
@@ -98,7 +113,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 verts["id"+pos.cPos] = i;
             }
 
-            verts.push(vec);
+            vec.z=this.CTRL.position.z;
+
+            //this is a problem
+            if(i>0&&i<this.detail-2)
+                verts.push(vec);
 
         }
         this.geo.vertices = verts;
@@ -115,7 +134,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         for(var i = 0 ; i < this.sides ; i++){
 
-            var c = this.args.data.bpTwist*this.counter*.01;// this.counter*.01;
+            var c = Utils.remap(this.args.data.bpTwist)*this.counter*.01;// this.counter*.01;
 
             var vec = new THREE.Vector3(
                     Math.sin(c+(i/this.sides*Math.PI*2))*1e6,
@@ -126,11 +145,13 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
+            this.castObject.scale = new THREE.Vector3(Utils.remap(1+this.args.data.bpSize),1+this.args.data.bpSize,1+this.args.data.bpSize);
 
-            this.castObject.rotation.x=this.args.data.cbTwistX*this.counter*.1;
-            this.castObject.rotation.y=this.args.data.cbTwistY*this.counter*.1;
-            this.castObject.rotation.z=this.args.data.cbTwistZ*this.counter*.1;
-            this.castObject.position.z=Math.sin(this.counter*this.args.data.bpSize)*20*this.args.data.cbTwist;
+            this.castObject.rotation.x=Utils.remap(this.args.data.cbTwistX)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
+            this.castObject.rotation.y=Utils.remap(this.args.data.cbTwistY)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
+            this.castObject.rotation.z=Utils.remap(this.args.data.cbTwistZ)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
+
+            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*.5)*5*this.args.data.cbWobbleMult;
 
             this.castObject.updateMatrixWorld();
 

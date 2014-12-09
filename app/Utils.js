@@ -1,8 +1,6 @@
 define(["THREE"],function(THREE){
 
-	return {
-
-		linearCurve:function(vecs,closed){
+	var linearCurve = function(vecs,closed){
 			
 			//points to return
 			this.points = [];
@@ -10,7 +8,7 @@ define(["THREE"],function(THREE){
 			var close = closed ? true:false;
 
 			//one dimensional array of vectors
-			this.vecs = vecs || [];
+			this.vecs = cloneArray(vecs) || [];
 
 			if(close)
 				this.vecs.push(this.vecs[0].clone());
@@ -113,8 +111,26 @@ define(["THREE"],function(THREE){
 				}
 				
 			};
-		},
+		};
 
+	var cloneArray = function(arr){
+		var r = [];
+
+		for(var i = 0 ; i < arr.length ; i++){
+			r.push(arr[i]);
+		}
+
+		return r;
+	}
+
+
+	return {
+
+		linearCurve:linearCurve,
+
+		lerp:function(a,b,t){
+			return a + ((b-a)*t);
+		},
 
 	    arrayToVecs:function(arr){
 
@@ -129,8 +145,6 @@ define(["THREE"],function(THREE){
 
 	    JSONSongToCurves:function(obj){
 	    	this.songCurves = [];
-
-
 	    },
 
 		Wave:function(){
@@ -193,6 +207,12 @@ define(["THREE"],function(THREE){
 			if (a[i] !== b[i]) return false;
 			}
 			return true;
+		},
+
+		map:THREE.Math.mapLinear,
+
+		remap:function(val){
+			return (val*2)-1;//THREE.Math.mapLinear(val,-1,1,0,1);
 		},
 
 		makeNurbs:function(points,det,returnGeom,spaced){

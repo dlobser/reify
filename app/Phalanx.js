@@ -70,8 +70,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 // var NG = this.CastnGons[this.nGons.length-1];
                 NG.CTRL.rotation.z = (i/this.amount)*Math.PI*2;
 
-                NG.CTRL.rotation.z += this.data[0].twist * j *.01;
-                NG.CTRL.rotation.z += this.data[0]["twist"+i] * j* .01;
+                NG.CTRL.rotation.z += Utils.remap(this.data[0].twist) * j *.01;
+                NG.CTRL.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j* .01;
 
                 NG.CTRL2.position.y = 1+(this.data[0].offset*100);
 
@@ -84,6 +84,25 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
             }
             j++;
         }
+
+        // nothing:0.0,
+        //         linearSpline:0.0,
+        //         bpSides:0.0,
+        //         bpSize:0.5,
+        //         bpTwist:0.0,
+        //         cbTwist:0.0,
+        //         cbTwistX:0.5,
+        //         cbTwistY:0.5,
+        //         cbTwistZ:0.5,
+        //         cbWobbleMult:0.0,
+        //         cbWobbleFreq:0.0,
+        //         tpPetals:.3,
+        //         sinTri:0.0,
+        //         tpMult:0.5,
+        //         tpLoop:0.5,
+        //         tpTwist:0.5,
+        //         tpCornerMult:0.5,
+        //         songMult:0.0,
 
         // console.log(this._currentLayer);
         this._currentLayer += this._layerStep;

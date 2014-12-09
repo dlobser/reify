@@ -12,10 +12,10 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 
 	}
-	var ui = new Interface.UI({res:150,setCtrl:c});
+	// var ui = new Interface.UI({res:150,setCtrl:c});
 	// ui.init();
 	// ui.background();
-	ui.animate();
+	// ui.animate();
 	// ui.drawVectors();
 
 	/**
@@ -23,7 +23,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 	 */
 	
 	varR = true;
-	var4 = var3 = varW = false;
+	var4 = var3 = varW = varE = varT = false;
 
 	var ShapeGenerator = function(container, width, height){
 
@@ -68,20 +68,24 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
         coreValues = function(n){
         	return {name:n,values:{
-                nothing:0,
-	            bpSides:0,
-	            bpSize:0,
-	            bpTwist:0,
-	            cbTwist:0,
-	            cbTwistX:0,
-	            cbTwistY:0,
-	            cbTwistZ:0,
+                nothing:0.0,
+                linearSpline:0.0,
+	            bpSides:0.0,
+	            bpSize:0.5,
+	            bpTwist:0.5,
+	            cbTwist:0.5,
+	            cbTwistX:0.5,
+	            cbTwistY:0.5,
+	            cbTwistZ:0.5,
+	            cbWobbleMult:0.0,
+	            cbWobbleFreq:0.0,
 	            tpPetals:.3,
-	            tpMult:0,
-	            tpLoop:0,
-	            tpTwist:0,
-	            tpCornerMult:0,
-	            songMult:0,
+	            sinTri:0.0,
+	            tpMult:0.5,
+	            tpLoop:0.5,
+	            tpTwist:0.5,
+	            tpCornerMult:0.5,
+	            songMult:0.0,
         	}};
         }
 
@@ -91,12 +95,12 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
         };
 
         buildObject.folders.push({name:"base",values:{
-                twist:0,
+                twist:0.5,
                 offset:0,
         	}})
 
         for(var i = 0 ; i < amt ; i++){
-        	buildObject.folders[0].values["twist"+i]=0;
+        	buildObject.folders[0].values["twist"+i]=0.5;
         	buildObject.folders.push(new coreValues("core"+i))
         }
 
@@ -108,7 +112,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 		this.camera = new THREE.PerspectiveCamera( 30, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({alpha : true});
-		this.renderer.setClearColor( 0x999999, 1);
+		this.renderer.setClearColor( 0x112233, 1);
 		this.renderer.setSize(width, height);
 
 
@@ -134,7 +138,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 			passInfo[i] = info[k];
 			i++;
 		}
-		passInfo[1].arrayData = ui.getVecs();
+		// passInfo[1].arrayData = ui.getVecs();
 
 		// console.log
 		// passInfo[0] = info.core0;
@@ -185,8 +189,9 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 		requestAnimationFrame(this.animate.bind(this));
 		this.controls.update(10);
 		this.renderer.render( this.scene, this.camera );
+
 		// console.log(this.p);
-		this.p.data[1].arrayData = ui.getVecs();
+		// this.p.data[1].arrayData = ui.getVecs();
 		// ui.background();
 		// 	ui.drawVectors();
 
@@ -201,6 +206,26 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 				varR=false;
 				varW=false;
 			}
+		}
+
+		if(varE){
+			// console.log(JSON.stringify(this.p.data));
+			var st = "info2 = " + JSON.stringify(info);
+			console.log(st);
+			eval(st);
+			varE=false;
+		}
+
+		if(varT){
+			for (var key in info2) {
+                if (info2.hasOwnProperty(key)){
+                    for (var hey in info2[key]) {
+                        if(typeof info2[key][hey] == "number")
+                            info[key][hey] = info2[key][hey];
+                    }
+                }
+            }
+            varT = false;
 		}
 
 		if(var3){
