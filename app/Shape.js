@@ -2,7 +2,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 	// require(["ModelGenerator/UI"]);
 	// "use strict";
-	console.log(Interface.UI);
+	// console.log(Interface.UI);
 	var c = [];
 	var q=-1;
 	for(var i = 0 ; i < 6 ; i++){
@@ -68,12 +68,11 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
         coreValues = function(n){
         	return {name:n,values:{
-                nothing:0.0,
                 linearSpline:0.0,
 	            bpSides:0.0,
 	            bpSize:0.5,
 	            bpTwist:0.5,
-	            cbTwist:0.5,
+	            cbTwist:0.75,
 	            cbTwistX:0.5,
 	            cbTwistY:0.5,
 	            cbTwistZ:0.5,
@@ -84,6 +83,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 	            tpMult:0.5,
 	            tpLoop:0.5,
 	            tpTwist:0.5,
+	            tpTwist2:0.5,
 	            tpCornerMult:0.5,
 	            songMult:0.0,
         	}};
@@ -96,7 +96,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
         buildObject.folders.push({name:"base",values:{
                 twist:0.5,
-                offset:0,
+                offset:0.5,
         	}})
 
         for(var i = 0 ; i < amt ; i++){
@@ -104,8 +104,46 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
         	buildObject.folders.push(new coreValues("core"+i))
         }
 
+        buildObject.folders[1].values.linearSpline=0.1;
+        buildObject.folders[1].values.bpSides=0.1;
+        buildObject.folders[1].values.bpSize=0.5;
+        buildObject.folders[1].values.bpTwist=0.5;
+        buildObject.folders[1].values.cbTwist=0.75;
+        buildObject.folders[1].values.cbTwistX=0.5;
+        buildObject.folders[1].values.cbTwistY=0.5;
+        buildObject.folders[1].values.cbTwistZ=0.5;
+        buildObject.folders[1].values.cbWobbleMult=0.1;
+        buildObject.folders[1].values.cbWobbleFreq=0.1;
+        buildObject.folders[1].values.tpPetals=0.3;
+        buildObject.folders[1].values.sinTri=0.1;
+        buildObject.folders[1].values.tpMult=0.5;
+        buildObject.folders[1].values.tpLoop=0.5;
+        buildObject.folders[1].values.tpTwist=0.5;
+        buildObject.folders[1].values.tpTwist2=0.5;
+        buildObject.folders[1].values.tpCornerMult=0.5;
+        buildObject.folders[1].values.songMult=0.1;
+
         Interface.rebuildGui(buildObject);
 
+
+ 		buildObject.folders[1].values.linearSpline=0.0;
+        buildObject.folders[1].values.bpSides=0.0;
+        buildObject.folders[1].values.bpSize=0.5;
+        buildObject.folders[1].values.bpTwist=0.5;
+        buildObject.folders[1].values.cbTwist=0.75;
+        buildObject.folders[1].values.cbTwistX=0.5;
+        buildObject.folders[1].values.cbTwistY=0.5;
+        buildObject.folders[1].values.cbTwistZ=0.5;
+        buildObject.folders[1].values.cbWobbleMult=0.0;
+        buildObject.folders[1].values.cbWobbleFreq=0.0;
+        buildObject.folders[1].values.tpPetals=0.3;
+        buildObject.folders[1].values.sinTri=0.0;
+        buildObject.folders[1].values.tpMult=0.5;
+        buildObject.folders[1].values.tpLoop=0.5;
+        buildObject.folders[1].values.tpTwist=0.5;
+        buildObject.folders[1].values.tpTwist2=0.5;
+        buildObject.folders[1].values.tpCornerMult=0.5;
+        buildObject.folders[1].values.songMult=0.0;
         // Interface.rebuildGui({values:rData,sliders:7});
 
 
@@ -118,7 +156,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 		container.append(this.renderer.domElement);
 
-		this.camera.position.z = -300;
+		this.camera.position.z = 300;
 		this.camera.lookAt(new THREE.Vector3 (0.0, 0.0, 0.0));
 		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement);
 
@@ -140,7 +178,6 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 		}
 		// passInfo[1].arrayData = ui.getVecs();
 
-		// console.log
 		// passInfo[0] = info.core0;
 		// passInfo[1] = info.core1;
 
@@ -148,8 +185,9 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 		// var sp = new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial(  ));
 		// this.scene.add(sp);
-				// this.makeShape();
-		this.p = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:100,polySize:20,detail:500, song:Songs.song});
+		// this.makeShape();
+		// 
+		this.p = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:200,polySize:20,detail:500, song:Songs.song});
 		this.animate();
 		this.counter = 0;
 
@@ -161,41 +199,15 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 		this.counter++;
 
-		// if(typeof this.object !== 'undefined'){
-		// 	// this.object.dispose();
-		// 	this.object.traverse(function(obj){
-		// 		// console.log(obj);
-		// 		if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
-	 //                obj.geometry.dispose();
-	 //                obj.material.dispose();
-	 //            }
-	 //            if(obj.parent)
-	 //            	obj.parent.remove(obj);
-	 //            // obj = null;
-		// 	})
-		// }
-		// if(typeof this.p !== 'undefined'){
-		// 	this.p.dispose();
-		// }
-        
         this.object = this.p.init();
-        // this.object = new nGon({data:data});
-        // this.object.init();
-        // console.log(this.object);
         this.scene.add(this.object);
 	};
 
 	ShapeGenerator.prototype.animate = function(){
+
 		requestAnimationFrame(this.animate.bind(this));
 		this.controls.update(10);
 		this.renderer.render( this.scene, this.camera );
-
-		// console.log(this.p);
-		// this.p.data[1].arrayData = ui.getVecs();
-		// ui.background();
-		// 	ui.drawVectors();
-
-
 
 		if(varR){
 			this.makeShape();
@@ -210,7 +222,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 		if(varE){
 			// console.log(JSON.stringify(this.p.data));
-			var st = "info2 = " + JSON.stringify(info);
+			var st = "info2 = " + JSON.stringify(info) + ";varT=true;";
 			console.log(st);
 			eval(st);
 			varE=false;

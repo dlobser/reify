@@ -16,8 +16,6 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.caster = new THREE.Raycaster();
 
         this.wave = new Utils.Wave();
-        // this.counter = args.counter || 0;
-        // console.log(this.args);
 
     }
 
@@ -31,7 +29,6 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.makeObject();
 
         return this.Curve;
-        // this.add(new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial()));
     };
 
     CastnGon.prototype.turtle = function(){
@@ -51,22 +48,13 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
             var pos,aim;
 
-            var off = .00000001;
+            var off = 0.00000001;
+
             if(io+off>1)
                 off=0;
 
-            // if(this.curveType == "linear"){
-            pos = this.getPointAt(io,aData.linearSpline);//this.linearCurve.getEvenPointAt(io,aData.nothing).lerp(this.splineCurve.getPointAt(io),aData.nothing);
-            aim = this.getPointAt(io+off,aData.linearSpline);//this.linearCurve.getEvenPointAt(io+off,aData.nothing).lerp(this.splineCurve.getPointAt(io+off),aData.nothing);
-            // }
-            // else{
-            //     pos = this.path.getPointAt(io);
-            //     offPos = io+0.000000001;
-            //     if(offPos>1)
-            //         offPos=0;
-            //     aim = this.path.getPointAt(offPos);
-            // }
-            // console.log(io);
+            pos = this.getPointAt(io,aData.linearSpline);
+            aim = this.getPointAt(io+off,aData.linearSpline);
 
             if(typeof pos.cPos == 'undefined')
                 pos.cPos = io*this.cVerts.length;
@@ -80,24 +68,24 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
             var arrayMult = 1;//aData.arrayData.getPointAt(this.args.offset/this.args.layers).x;
 
-            var veca = arrayMult*Math.sin((this.counter*Utils.remap(aData.tpTwist))+
+            var veca = arrayMult*Math.sin((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
                 pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
                 (Utils.remap(aData.tpMult) + sinMult)*5*
-                Math.max((.5+Utils.remap(aData.tpCornerMult)),
+                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
-            var vecb = arrayMult*this.wave.TriSin((this.counter*Utils.remap(aData.tpTwist))+
+            var vecb = arrayMult*this.wave.TriSin((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
                 pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
                 (Utils.remap(aData.tpMult) + sinMult)*5*
-                Math.max((.5+Utils.remap(aData.tpCornerMult)),
+                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
 
-            kid.position.z = arrayMult*Math.cos((this.counter*Utils.remap(aData.tpTwist))+
+            kid.position.z = arrayMult*Math.cos((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
                 pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
                 (Utils.remap(aData.tpLoop) )*5*
-                Math.max((.5+Utils.remap(aData.tpCornerMult)),
+                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
                 ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             var vec = new THREE.Vector3();
@@ -120,8 +108,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 verts.push(vec);
 
         }
-        this.geo.vertices = verts;
 
+        this.geo.vertices = verts;
 
         this.CTRL.remove(base);
     };
@@ -130,11 +118,11 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
     CastnGon.prototype.makeSimplePoly = function(){
 
 
-        this.counter++;
+        // this.counter++;
 
         for(var i = 0 ; i < this.sides ; i++){
 
-            var c = Utils.remap(this.args.data.bpTwist)*this.counter*.01;// this.counter*.01;
+            var c = Utils.remap(this.args.data.bpTwist)*this.counter*0.01;// this.counter*.01;
 
             var vec = new THREE.Vector3(
                     Math.sin(c+(i/this.sides*Math.PI*2))*1e6,
@@ -145,36 +133,32 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            this.castObject.scale = new THREE.Vector3(Utils.remap(1+this.args.data.bpSize),1+this.args.data.bpSize,1+this.args.data.bpSize);
+            var sc = Utils.remap(1+this.args.data.bpSize);
 
-            this.castObject.rotation.x=Utils.remap(this.args.data.cbTwistX)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
-            this.castObject.rotation.y=Utils.remap(this.args.data.cbTwistY)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
-            this.castObject.rotation.z=Utils.remap(this.args.data.cbTwistZ)*this.counter*.02*(.5+Utils.remap(this.args.data.cbTwist)*3);
+            this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
-            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*.5)*5*this.args.data.cbWobbleMult;
+            this.castObject.rotation.x=Utils.remap(this.args.data.cbTwistX)*this.counter*0.02*(Utils.remap(this.args.data.cbTwist)*3);
+            this.castObject.rotation.y=Utils.remap(this.args.data.cbTwistY)*this.counter*0.02*(Utils.remap(this.args.data.cbTwist)*3);
+            this.castObject.rotation.z=Utils.remap(this.args.data.cbTwistZ)*this.counter*0.02*(Utils.remap(this.args.data.cbTwist)*3);
+
+            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*0.5)*5*this.args.data.cbWobbleMult;
 
             this.castObject.updateMatrixWorld();
 
-            // console.log(this.castObject.rotation);
-
-            this.caster.set(vec,dir);//.pickingRay( new THREE.Vector3(0,0,10), new THREE.Vector3(0,0,-10) );
+            this.caster.set(vec,dir);
             var pPos = this.caster.intersectObject(this.castObject);
 
-            // var intersect = ray.intersectObject( this.castObject ); 
-
-            var r = vec.multiplyScalar(.000001);//new THREE.Vector3(0,0,0);
+            var r = vec.multiplyScalar(0.000001);
 
             if(typeof pPos[0]!=='undefined'){
-                if ( typeof pPos[0].point !== 'undefined') { 
-                    r = pPos[0].point;//new THREE.Vector3(intersect[0].point.x,intersect[0].point.y,intersect[0].point.z);
-                    
+                if ( typeof pPos[0].point !== 'undefined') {
+                    r = pPos[0].point;
                 }
             }
 
             this.cVerts.push(r);
-        };
+        }
 
-       
     };
 
     CastnGon.prototype.dispose = function(obj,scene){
@@ -187,25 +171,6 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
         this.castObject.material = null;
         this.castObject = null;
         this.caster = null;
-
-        // if(this.children){
-        //     var that = this;
-        //     this.traverse(function(obj){
-
-        //         if(obj instanceof THREE.Line || obj instanceof THREE.Mesh){
-        //             obj.geometry.dispose();
-        //             obj.material.dispose();
-        //         }
-        //         that.remove(obj);
-        //         obj = null;
-        //     });
-        // // }
-        // scene.remove(obj);
-        // if(obj.geometry)
-        //         this.Line.geometry.dispose();
-        // // if(obj.material)
-        //         this.Line.material.dispose();
-
     };
 
     return CastnGon;

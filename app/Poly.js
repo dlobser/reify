@@ -7,6 +7,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function
 
         this.ctrlPoints = args.ctrlPoints || [];
         this.closed = args.closed ? true:false;
+
         //curve vertices
         this.cVerts = [];
         this.path = null;
@@ -34,18 +35,15 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function
 
     Poly.prototype.makeCurve = function(){
 
-        // if(this.curveType == "linear")
-            this._makeSplineCurve();
-            // console.log(this.cVerts)
-            this._makeLinearCurve();
-        // else
+        this._makeSplineCurve();
+        this._makeLinearCurve();
             
 
     };
 
     Poly.prototype.getPointAt = function(t,v){
 
-        var thet = t || 0;
+        var theta = t || 0;
         var val = v || 0;
 
         if(val>1)
@@ -53,22 +51,12 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function
         if(val<0)
             val=0;
 
-        if(thet>1)
-            thet=1;
-        if(thet<0)
-            thet=0;
+        if(theta>1)
+            theta=1;
+        if(theta<0)
+            theta=0;
 
-        // var veca = this.linearCurve.getEvenPointAt(t);
-        // var vecb = this.splineCurve.getPointAt(t);
-        return this.linearCurve.getEvenPointAt(thet).lerp(this.splineCurve.getPointAt(thet),val);
-        // aim = this.linearCurve.getEvenPointAt(io+off,aData.nothing).lerp(this.splineCurve.getPointAt(io+off),aData.nothing);
-           
-
-        // var r = veca.lerp(vecb,val);
-        // r.cPos = vecb;
-        // console.log(r);
-        // return this.linearCurve.getEvenPointAt(t).lerp(this.splineCurve.getPointAt(t),val);
-        // return veca;
+        return this.linearCurve.getEvenPointAt(theta).lerp(this.splineCurve.getPointAt(theta),val);
 
     };
 
@@ -86,17 +74,19 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function
     //combine vertices and material into a geometry and parent it to this
     Poly.prototype.makeObject = function(func,args){
 
-       
         if(this.closed && this.geo.vertices.length>0)
             this.geo.vertices.push(this.geo.vertices[0].clone());
 
         for(var i = 0 ; i < this.geo.vertices.length ; i++){
-            this.geo.colors[i] = new THREE.Color((2+Math.sin(i*.1))/3,(2+Math.cos(2+i*.1))/3,(2+Math.sin(1+i*.1))/3);
+            var c2 = new THREE.Color((2+Math.sin(i*0.1))/5,(2+Math.cos(2+i*0.1))/5,(2+Math.sin(1+i*0.1))/5);
+            var v = this.geo.vertices[i];
+            var c = .3+noise(v.x*0.3,v.y*0.3,v.z*0.3)/2;
+            this.geo.colors[i] = new THREE.Color(c+c2.r,c+c2.g,c+c2.b);
         }
 
-        this.Curve.geometry = this.geo.clone();// = new THREE.Line(this.geo,this.mat);
+        this.Curve.geometry = this.geo;
         this.Curve.geometry.colors = this.geo.colors;
-        this.Curve.material = this.mat.clone();
+        this.Curve.material = this.mat;
     };
 
     Poly.prototype.dispose = function(){
