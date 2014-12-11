@@ -538,6 +538,7 @@ define(["THREE"],function(THREE){
 
 			return b;
 		},
+		
 		isUndef : function(thing){
 			return thing === void 0;
 		}

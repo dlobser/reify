@@ -44,14 +44,14 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
         for(var i = 0 ; i < this.detail ; i++){
 
-            var io = i/(this.detail-1);
+            var io = i/(this.detail);
 
             var pos,aim;
 
-            var off = 0.00000001;
+            var off = 0.0001;
 
-            if(io+off>1)
-                off=0;
+            // if(io+off>1)
+            //     off=0;
 
             pos = this.getPointAt(io,aData.linearSpline);
             aim = this.getPointAt(io+off,aData.linearSpline);
@@ -68,25 +68,69 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
 
             var arrayMult = 1;//aData.arrayData.getPointAt(this.args.offset/this.args.layers).x;
 
-            var veca = arrayMult*Math.sin((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
-                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
-                (Utils.remap(aData.tpMult) + sinMult)*5*
-                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
-                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+            var twist2 = this.counter*Utils.remap(aData.tpTwist2);
+            var twist = this.counter*Utils.remap(aData.tpTwist);
+            var petals = Math.floor(aData.tpPetals*15);
+            var petalMult = (Utils.remap(aData.tpMult) + sinMult);
+            var petalLoop = Utils.remap(aData.tpLoop);
+            var cornerMult = Utils.remap(aData.tpCornerMult)/2;
+            var cornerCos = ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2);
 
-            var vecb = arrayMult*this.wave.TriSin((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
-                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
-                (Utils.remap(aData.tpMult) + sinMult)*5*
-                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
-                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+            var veca = arrayMult*
+                Math.sin(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2*
+                        (petals))*
+                    petalMult*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+             // var veca = arrayMult*Math.sin((this.counter*Utils.remap(aData.tpTwist2)*0.5+
+             //    this.counter*Utils.remap(aData.tpTwist)*3)+
+             //    pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+             //    (Utils.remap(aData.tpMult) + sinMult)*5*
+             //    Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
+             //    ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+              var vecb = arrayMult*
+                this.wave.TriSin(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2
+                        *(petals))*
+                    petalMult*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+            // var vecb = arrayMult*
+            //     this.wave.TriSin(
+            //         (this.counter*Utils.remap(aData.tpTwist2)*0.5+
+            //     this.counter*Utils.remap(aData.tpTwist)*3)+
+            //     pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+            //     (Utils.remap(aData.tpMult) + sinMult)*5*
+            //     Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
+            //     ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
 
-            kid.position.z = arrayMult*Math.cos((this.counter*Utils.remap(aData.tpTwist2)*0.5+this.counter*Utils.remap(aData.tpTwist)*3)+
-                pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
-                (Utils.remap(aData.tpLoop) )*5*
-                Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
-                ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
+            kid.position.z = arrayMult*
+                Math.cos(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2
+                        *(petals))*
+                    petalLoop*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+                // kid.position.z = arrayMult*Math.cos((this.counter*Utils.remap(aData.tpTwist2)*0.5+
+                // this.counter*Utils.remap(aData.tpTwist)*3)+
+                // pos.cPos*Math.PI*2*(Math.floor(aData.tpPetals*15)))*
+                // (petalLoop )*5*
+                // Math.max((0.5+Utils.remap(aData.tpCornerMult)/2),
+                // ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2));
 
             var vec = new THREE.Vector3();
             this.CTRL.updateMatrixWorld();
@@ -104,7 +148,7 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
             vec.z=this.CTRL.position.z;
 
             //this is a problem
-            if(i>0&&i<this.detail-2)
+            if(i>0)
                 verts.push(vec);
 
         }

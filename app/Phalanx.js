@@ -40,6 +40,8 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
     }
 
 
+
+
     Phalanx.prototype.init = function(){
 
         var j = this._currentLayer;
@@ -57,6 +59,13 @@ define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGen
                 // this.args.offset = j;
                 this.args.layers = this.layers;
                 this.args.data = this.data[i+1];
+
+                if(i==1){
+                    for(var k in this.data[1]){
+                        var num = this.data[1][k] + (this.data[1][k]-this.data[2][k]);
+                        this.args.data[k] = num;
+                    }
+                }
 
                 var NG = new CastnGon(this.args);
 

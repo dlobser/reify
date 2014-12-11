@@ -27,7 +27,7 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 	var ShapeGenerator = function(container, width, height){
 
-		var amt = 1;
+		var amt = 2;
 
 		rData = {
 
