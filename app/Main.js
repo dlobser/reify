@@ -38,7 +38,7 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "ModelGenerator/Shape"], function(ready, $, ShapeGenerator){
+require(["domReady!", "jquery", "ModelGenerator/shape/Shape"], function(ready, $, ShapeGenerator){
 
 	console.log("Reify Shape Generator v0");
 

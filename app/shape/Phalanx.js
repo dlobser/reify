@@ -1,4 +1,6 @@
-define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGenerator/nGon", "ModelGenerator/CastnGon" ], function(THREE, noise, Utils, nGon, CastnGon){
+define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils", 
+    "ModelGenerator/shape/nGon", "ModelGenerator/shape/CastnGon" ], 
+function(THREE, noise, Utils, nGon, CastnGon){
 
     function Phalanx(params){
 

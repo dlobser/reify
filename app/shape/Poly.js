@@ -1,4 +1,5 @@
-define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils"], function(THREE, noise, Utils){
+define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils"], 
+function(THREE, noise, Utils){
 
         
     function Poly(params){

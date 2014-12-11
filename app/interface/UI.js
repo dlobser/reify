@@ -1,4 +1,5 @@
-define(["THREE","ModelGenerator/Interface"], function (THREE,Interface) {
+define(["THREE", "ModelGenerator/interface/Interface"], 
+function (THREE,Interface) {
 
 
 	Interface.UI = function(args){
