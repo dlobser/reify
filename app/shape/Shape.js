@@ -1,8 +1,9 @@
-define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitControls", "ModelGenerator/Interface", "ModelGenerator/PerlinNoise", "ModelGenerator/Phalanx", "ModelGenerator/nGon", "ModelGenerator/Songs", "ModelGenerator/UI"], function(THREE, Flower, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs, UI){
+define(["THREE", "ModelGenerator/utils/File", "OrbitControls", "ModelGenerator/interface/GUI", 
+	"ModelGenerator/utils/PerlinNoise", "ModelGenerator/shape/Phalanx", "ModelGenerator/shape/nGon", 
+	"ModelGenerator/data/Songs"], 
+function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs){
 
-	// require(["ModelGenerator/UI"]);
 	// "use strict";
-	// console.log(Interface.UI);
 	var c = [];
 	var q=-1;
 	for(var i = 0 ; i < 6 ; i++){
@@ -12,12 +13,6 @@ define(["THREE", "ModelGenerator/Generator", "ModelGenerator/FileUtils", "OrbitC
 
 
 	}
-	// var ui = new Interface.UI({res:150,setCtrl:c});
-	// ui.init();
-	// ui.background();
-	// ui.animate();
-	// ui.drawVectors();
-
 	/**
 	 *  setup the three.js environment
 	 */

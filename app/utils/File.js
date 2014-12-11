@@ -1,4 +1,3 @@
-
 define(function(){
 
 	function saveGCode(arr,scalar,height) {

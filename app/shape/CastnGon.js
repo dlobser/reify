@@ -1,4 +1,5 @@
-define(["THREE", "ModelGenerator/PerlinNoise", "ModelGenerator/Utils", "ModelGenerator/Poly"], function(THREE, noise, Utils, Poly){
+define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils", "ModelGenerator/shape/Poly"], 
+    function(THREE, noise, Utils, Poly){
 
     function CastnGon(params){
 
