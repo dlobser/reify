@@ -22,17 +22,12 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 
 	var ShapeGenerator = function(container, width, height){
 
-<<<<<<< HEAD
 		var amt = 2;
-=======
 		/**
 		 *  if the shape is regenerated every frame
 		 *  @type {Boolean}
 		 */
 		this.paused = false;
-
-		var amt = 1;
->>>>>>> 380326ee85366eb02b77450a515038a81479ff3b
 
 		rData = {
 
