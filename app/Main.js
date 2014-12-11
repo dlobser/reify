@@ -38,23 +38,25 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "ModelGenerator/shape/Shape"], function(ready, $, ShapeGenerator){
+require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard"], 
+function(ready, $, ShapeGenerator, Keyboard){
 
-	console.log("Reify Shape Generator v0");
+	console.log("Reify Shape Generator v5");
 
 	var container = $("#Container");
 
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
-	generator.makeShape({
-		squiggle: Math.random(),
-		rope: Math.random(),
-		tower: Math.random(),
-		KB: Math.random(),
-		zig: Math.random(),
-		squares: Math.random(),
-		sprinkles: Math.random(),
-		petals: Math.random(),
+	//key bindings
+	Keyboard.bindKey("r", function(){
+		if (generator.paused){
+			generator.pauseAnimation(false);
+		} else {
+			generator.pauseAnimation(true);
+		}
 	});
 
+	Keyboard.bindKey("4", function(){
+		generator.exportGCode();
+	});
 });

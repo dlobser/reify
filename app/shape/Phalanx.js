@@ -38,11 +38,11 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
         this.drawFinished = false;
         // this.CTRL.add(this.Line);
-
+        this.drawFinishedCallbacks = [];
     }
 
 
-    Phalanx.prototype.init = function(){
+    Phalanx.prototype.draw = function(){
 
         var j = this._currentLayer;
 
@@ -83,10 +83,7 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
                 NG.CTRL.position.z = j*this.layerHeight;
                 NG.init(this.args);
-                // this.Curve.geometry.vertices = this.Curve.geometry.vertices.concat(NG.geo.vertices);
                 this.Curve.add(NG.Curve);
-                // NG.dispose(NG,this);
-
             }
             j++;
         }
@@ -97,42 +94,31 @@ function(THREE, noise, Utils, nGon, CastnGon){
             this._currentLayer = 0;
             this.args.counter = 0;
             this.drawFinished = true;
-        }
-        else
+        } else {
             this.drawFinished = false;
-
-
-        // processLargeArray(this.nGons,this.Curve);
+            this.callDrawFinished();
+        }
 
         return this.Curve;
+    };   
+
+    /**
+     *  get the object. it'll wait until the object is
+     *  done drawing before returning it. 
+     */
+    Phalanx.prototype.onFinished = function(callback){
+    	this.drawFinishedCallbacks.push(callback);
     };
 
-    // Phalanx.prototype.update = function
-
-    // function processLargeArray(array,parent) {
-    //     // set this to whatever number of items you can process at once
-    //     var chunk = 5;
-    //     var index = 0;
-
-    //     function doChunk() {
-
-    //         var cnt = chunk;
-
-    //         while (cnt-- && index < array.length) {
-    //             // process array[index] here
-    //             parent.add(array[index].init());
-    //             ++index;
-    //         }
-    //         if (index < array.length) {
-    //             // set Timeout for async iteration
-    //             setTimeout(doChunk, 1);
-    //         }
-    //     }
-
-    //     doChunk();    
-    // }
-
-   
+    /**
+     *  invoke all of the callbacks which were expected at the end of the draw
+     */
+    Phalanx.prototype.callDrawFinished = function(){
+    	for (var i = 0; i < this.drawFinishedCallbacks.length; i++){
+    		this.drawFinishedCallbacks[i](this);
+    	}
+    	this.drawFinishedCallbacks = [];
+    };
 
     Phalanx.prototype.dispose = function(){
 

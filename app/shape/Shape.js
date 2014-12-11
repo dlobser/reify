@@ -22,6 +22,12 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 
 	var ShapeGenerator = function(container, width, height){
 
+		/**
+		 *  if the shape is regenerated every frame
+		 *  @type {Boolean}
+		 */
+		this.paused = false;
+
 		var amt = 1;
 
 		rData = {
@@ -160,7 +166,6 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 		this.light = new THREE.PointLight( 0xffffff );
 		this.light.position.copy( this.camera.position );
 		this.scene.add( this.light );
-		this.counter = 0;
 
 		this.objects = [];
 
@@ -182,85 +187,52 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 		// this.scene.add(sp);
 		// this.makeShape();
 		// 
-		this.p = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:200,polySize:20,detail:500, song:Songs.song});
+		this.phalanx = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:200,polySize:20,detail:500, song:Songs.song});
+		this.scene.add(this.phalanx.Curve);
 		this.animate();
-		this.counter = 0;
-
-		
 	};
 
-	ShapeGenerator.prototype.makeShape = function(parameters) {
-
-
-		this.counter++;
-
-        this.object = this.p.init();
-        this.scene.add(this.object);
-	};
-
+	/**
+	 *  animation loop
+	 */
 	ShapeGenerator.prototype.animate = function(){
 
 		requestAnimationFrame(this.animate.bind(this));
 		this.controls.update(10);
 		this.renderer.render( this.scene, this.camera );
 
-		if(varR){
-			this.makeShape();
+		//pause now
+		if(!this.paused){
+        	this.object = this.phalanx.draw();
 		}
+	};
 
-		if(varW){
-			if(this.p.drawFinished){
-				varR=false;
-				varW=false;
+	/**
+	 *  export the model as gcode
+	 */
+	ShapeGenerator.prototype.exportGCode = function(){
+		var layerHeight = this.phalanx.layerHeight;
+		this.phalanx.onFinished(function(phalnx){
+			var verts = [];
+			var children = phalnx.Curve.children;
+			for(var i = 0 ; i < children.length ; i++){
+				verts = verts.concat(children[i].geometry.vertices);
 			}
-		}
+			FileUtils.saveGCode([verts], 1, layerHeight);
+		});
+	};
 
-		if(varE){
-			// console.log(JSON.stringify(this.p.data));
-			var st = "info2 = " + JSON.stringify(info) + ";varT=true;";
-			console.log(st);
-			eval(st);
-			varE=false;
-		}
-
-		if(varT){
-			for (var key in info2) {
-                if (info2.hasOwnProperty(key)){
-                    for (var hey in info2[key]) {
-                        if(typeof info2[key][hey] == "number")
-                            info[key][hey] = info2[key][hey];
-                    }
-                }
-            }
-            varT = false;
-		}
-
-		if(var3){
-        	var st = "";
-        	for(k in data){st+="data."+k+"="+data[k]+";\n"}
-        	console.log(st);
-        	var3=false;
-        }
-
-		if(var4){
-
-			if(this.p.drawFinished){
-				varW=false;
-			
-				var verts = [];
-
-				for(var i = 0 ; i < this.object.children.length ; i++){
-					verts = verts.concat(this.object.children[i].geometry.vertices);
-				}
-
-
-
-				// this.Curve.geometry.vertices = this.Curve.geometry.vertices.concat(NG.geo.vertices);
-		        // this.object.makeToolPath();
-		        // this.object.turtle();
-				FileUtils.saveGCode([verts],1,this.object.layerHeight)
-				var4=false;
-			}
+	/**
+	 *  pauses the animation. wait until the phalanx is generated before pausing
+	 */
+	ShapeGenerator.prototype.pauseAnimation = function(pause){
+		if (!pause){
+			this.paused = false;
+		} else {
+			var self = this;
+			this.phalanx.onFinished(function(){
+				self.paused = true;
+			});
 		}
 	};
 
@@ -276,34 +248,6 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 		this.object = null;
 		this.renderer = null;
 	};
-
-	function setScale(o,s){
-		o.scale.x = s;
-		o.scale.y = s;
-		o.scale.z = s;
-	}
-
-
-	window.onkeyup = onKeyUp;
-
-	function onKeyUp(evt) {
-
-		if(evt.keyCode == 87 ){ varW = !varW;}
-		if(evt.keyCode == 69 ){ varE = !varE;}
-		if(evt.keyCode == 82 ){ varR = !varR;}
-		if(evt.keyCode == 84 ){ varT = !varT;}
-		if(evt.keyCode == 89 ){ varY = !varY;}
-
-		if(evt.keyCode == 49 ){ var1 = !var1;}
-		if(evt.keyCode == 50 ){ var2 = !var2;}
-		if(evt.keyCode == 51 ){ var3 = !var3;}
-		if(evt.keyCode == 52 ){ var4 = !var4;}
-		if(evt.keyCode == 53 ){ var5 = !var5;}
-
-	}
-
-
-
 
 	return ShapeGenerator;
 });
