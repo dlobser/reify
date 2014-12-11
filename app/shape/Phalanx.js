@@ -12,6 +12,7 @@ function(THREE, noise, Utils, nGon, CastnGon){
         this.layers = args.layers || 1;
         this.layerHeight = args.layerHeight || 0.27;
         this.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
+        this.args.layers = this.layers;
 
         this.song = args.song || [];
         this.songCurve = new Utils.linearCurve(Utils.arrayToVecs(this.song));
@@ -52,24 +53,39 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
             this.args.counter++;
 
+            var theseCurves = [];
+
             for(var i = 0 ; i < this.amount ; i++){
 
                 // if(typeof this.ctrls[i]=='undefined')
                 //     this.ctrls[i] = new THREE.Object3D();
 
-                this.args.id = i+1;
+                // this.args.id = i+1;
                 // this.args.offset = j;
-                this.args.layers = this.layers;
-                this.args.data = this.data[i+1];
+               
+                
+
+                var a;
 
                 if(i==1){
-                    for(var k in this.data[1]){
-                        var num = this.data[1][k] + (this.data[1][k]-this.data[2][k]);
-                        this.args.data[k] = num;
+                    a.data = {};
+                    for(var k in this.args){
+                        var num = this.args[k];
+                        a[k] = num;
+                    }
+                    for(k in this.data[1]){
+                        var num = ((this.data[1][k]+this.data[2][k]));
+                        a.data[k] = num;
                     }
                 }
+                else{
+                    a = Utils.duplicateObject(this.args);
+                    a.data = this.data[1];
+                }
 
-                var NG = new CastnGon(this.args);
+                
+
+                var NG = new CastnGon(a);
 
                 // this.ctrls[i].add(NG.CTRL);
                 // if(typeof this.nGons[i+j*this.amount] !== 'undefined')
@@ -83,10 +99,10 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
                 // console.log(NG.testVariable);
                 // var NG = this.CastnGons[this.nGons.length-1];
-                NG.CTRL.rotation.z = (i/this.amount)*Math.PI*2;
+                // NG.CTRL.rotation.z = (i/this.amount)*Math.PI*2;
 
                 NG.CTRL.rotation.z += Utils.remap(this.data[0].twist) * j * 0.01;
-                NG.CTRL2.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j * 0.01;
+                // NG.CTRL2.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j * 0.01;
 
                 NG.CTRL2.position.y = Utils.remap((this.data[0].offset))*50;
 
@@ -94,10 +110,19 @@ function(THREE, noise, Utils, nGon, CastnGon){
                 NG.init(this.args);
                 // this.Curve.geometry.vertices = this.Curve.geometry.vertices.concat(NG.geo.vertices);
                 this.Curve.add(NG.Curve);
+                theseCurves.push(NG.Curve);
                 // NG.dispose(NG,this);
 
             }
             j++;
+
+            // for(var i = 0 ; i < theseCurves.length ; i++){
+            //     var connectorCurve = new THREE.Line();
+            //     var geo = new THREE.Geometry();
+            //     for(var k = 0 ; k < theseCurves[i].length ; k+=20){
+            //         geo.vertices.push(theseCurves[i][k])
+            //     }
+            // }
         }
 
         this._currentLayer += this._layerStep;

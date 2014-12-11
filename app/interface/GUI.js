@@ -27,7 +27,7 @@ define(["domReady!", "dat", "jquery"], function(ready, dat, $){
 		GUI = gui;
 
 			Object.keys(data).forEach(function (key) {
-				gui.add(data, key, 0.0, 1.0).listen().step(0.001);
+				gui.add(data, key, -1.0, 1.0).listen().step(0.001);
 			})
 			// gui.remember(data);
 			for (var i in gui.__controllers) {
@@ -44,7 +44,7 @@ define(["domReady!", "dat", "jquery"], function(ready, dat, $){
 				info[folders[i].name] = thisData;
 
 				Object.keys(thisData).forEach(function (key) {
-					folder.add(thisData, key, 0.0, 1.0).listen().step(0.001);
+					folder.add(thisData, key, -1.0, 1.0).listen().step(0.001);
 				})
 				gui.remember(thisData);
 				

@@ -90,8 +90,8 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
         };
 
         buildObject.folders.push({name:"base",values:{
-                twist:0.5,
-                offset:0.5,
+                twist:0.0,
+                offset:0.0,
         	}})
 
         for(var i = 0 ; i < amt ; i++){
@@ -123,22 +123,41 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 
  		buildObject.folders[1].values.linearSpline=0.0;
         buildObject.folders[1].values.bpSides=0.0;
-        buildObject.folders[1].values.bpSize=0.5;
-        buildObject.folders[1].values.bpTwist=0.5;
-        buildObject.folders[1].values.cbTwist=0.75;
-        buildObject.folders[1].values.cbTwistX=0.5;
-        buildObject.folders[1].values.cbTwistY=0.5;
-        buildObject.folders[1].values.cbTwistZ=0.5;
+        buildObject.folders[1].values.bpSize=0.0;
+        buildObject.folders[1].values.bpTwist=0.0;
+        buildObject.folders[1].values.cbTwist=0.0;
+        buildObject.folders[1].values.cbTwistX=0.0;
+        buildObject.folders[1].values.cbTwistY=0.0;
+        buildObject.folders[1].values.cbTwistZ=0.0;
         buildObject.folders[1].values.cbWobbleMult=0.0;
         buildObject.folders[1].values.cbWobbleFreq=0.0;
-        buildObject.folders[1].values.tpPetals=0.3;
+        buildObject.folders[1].values.tpPetals=0.0;
         buildObject.folders[1].values.sinTri=0.0;
-        buildObject.folders[1].values.tpMult=0.5;
-        buildObject.folders[1].values.tpLoop=0.5;
-        buildObject.folders[1].values.tpTwist=0.5;
-        buildObject.folders[1].values.tpTwist2=0.5;
-        buildObject.folders[1].values.tpCornerMult=0.5;
+        buildObject.folders[1].values.tpMult=0.0;
+        buildObject.folders[1].values.tpLoop=0.0;
+        buildObject.folders[1].values.tpTwist=0.0;
+        buildObject.folders[1].values.tpTwist2=0.0;
+        buildObject.folders[1].values.tpCornerMult=0.0;
         buildObject.folders[1].values.songMult=0.0;
+
+        buildObject.folders[2].values.linearSpline=0.0;
+        buildObject.folders[2].values.bpSides=0.0;
+        buildObject.folders[2].values.bpSize=0.0;
+        buildObject.folders[2].values.bpTwist=0.0;
+        buildObject.folders[2].values.cbTwist=0.0;
+        buildObject.folders[2].values.cbTwistX=0.0;
+        buildObject.folders[2].values.cbTwistY=0.0;
+        buildObject.folders[2].values.cbTwistZ=0.0;
+        buildObject.folders[2].values.cbWobbleMult=0.0;
+        buildObject.folders[2].values.cbWobbleFreq=0.0;
+        buildObject.folders[2].values.tpPetals=0.0;
+        buildObject.folders[2].values.sinTri=0.0;
+        buildObject.folders[2].values.tpMult=0.0;
+        buildObject.folders[2].values.tpLoop=0.0;
+        buildObject.folders[2].values.tpTwist=0.0;
+        buildObject.folders[2].values.tpTwist2=0.0;
+        buildObject.folders[2].values.tpCornerMult=0.0;
+        buildObject.folders[2].values.songMult=0.0;
         // Interface.rebuildGui({values:rData,sliders:7});
 
 

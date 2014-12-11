@@ -212,7 +212,7 @@ define(["THREE"],function(THREE){
 		map:THREE.Math.mapLinear,
 
 		remap:function(val){
-			return (val*2)-1;//THREE.Math.mapLinear(val,-1,1,0,1);
+			return val;//(val*2)-1;//THREE.Math.mapLinear(val,-1,1,0,1);
 		},
 
 		makeNurbs:function(points,det,returnGeom,spaced){
