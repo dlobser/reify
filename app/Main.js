@@ -59,4 +59,5 @@ function(ready, $, ShapeGenerator, Keyboard){
 	Keyboard.bindKey("4", function(){
 		generator.exportGCode();
 	});
+	
 });

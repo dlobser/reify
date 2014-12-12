@@ -29,43 +29,6 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 		 */
 		this.paused = false;
 
-		rData = {
-
-            nothing:0,
-
-            // bpScale:0,
-
-            bpSides:.68,
-            bpSize:0,
-            // bpLength:0,
-            // bpNoisePos:0,
-            // bpNoiseAnim:0,
-            // bpNoiseOffset:.5,//a.tower*towerMult,
-            // bpNoiseScale:0,
-            // bpNSFreq:.1,
-            bpTwist:0,
-
-            // bpScaleUp:0,
-            // bpTopScale:0,
-            // bpBulge:0,
-
-            cbTwist:0,
-            cbTwistX:0,
-            cbTwistY:0,
-            cbTwistZ:0,
-            
-            tpPetals:.3,
-            tpMult:0,
-            tpLoop:0,
-            tpTwist:0,
-            tpCornerMult:0,
-            songMult:0,
-            // tpNoiseMult:0,
-            // tpNoiseFreq:0,
-            // tpFlipFlop:1,
-
-        };
-
         coreValues = function(n){
         	return {name:n,values:{
                 linearSpline:0.0,
@@ -147,7 +110,7 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 
         buildObject.folders[2].values.linearSpline=0.0;
         buildObject.folders[2].values.bpSides=0.0;
-        buildObject.folders[2].values.bpSize=0.0;
+        buildObject.folders[2].values.bpSize=-0.1;
         buildObject.folders[2].values.bpTwist=0.0;
         buildObject.folders[2].values.cbTwist=0.0;
         buildObject.folders[2].values.cbTwistX=0.0;

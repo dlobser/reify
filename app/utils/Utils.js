@@ -482,6 +482,8 @@ define(["THREE"],function(THREE){
 			saveAs(blob, name);
 		},
 
+
+
 		makeFrame:function(size){
 
 			var center = new THREE.Object3D();
@@ -503,7 +505,7 @@ define(["THREE"],function(THREE){
 
 		purgeObject:function(o){
 
-			if(o.parent)
+			if(typeof o.parent !== 'undefined')
 				o.parent.remove(o);
 
 			o.traverse(function(obj){
@@ -512,7 +514,8 @@ define(["THREE"],function(THREE){
 					obj.material.dispose();
 					// obj.geometry.vertices = [];
 				}
-				});
+			});
+
 			o = null;
 		},
 

@@ -34,12 +34,14 @@ function(THREE, noise, Utils, nGon, CastnGon){
         this.updateFrequency = 5;
 
         this._currentLayer = 0;
-        this._layerStep = 10;
+        this._layerStep = 5;
         this.nGons = [];
 
         this.drawFinished = false;
         // this.CTRL.add(this.Line);
         this.drawFinishedCallbacks = [];
+
+        this.connectors = [];
     }
 
 
@@ -109,16 +111,32 @@ function(THREE, noise, Utils, nGon, CastnGon){
                 this.Curve.add(NG.Curve);
                 theseCurves.push(NG.Curve);
 
+                
             }
-            j++;
 
-            // for(var i = 0 ; i < theseCurves.length ; i++){
-            //     var connectorCurve = new THREE.Line();
-            //     var geo = new THREE.Geometry();
-            //     for(var k = 0 ; k < theseCurves[i].length ; k+=20){
-            //         geo.vertices.push(theseCurves[i][k])
-            //     }
-            // }
+            
+
+            if(!Utils.isUndef(this.connectors[j])){
+                Utils.purgeObject(this.connectors[j]);
+                // this.connectors[j]=null;
+            }
+
+            var geo = new THREE.Geometry();
+
+            for(var k = 0 ; k < theseCurves[0].geometry.vertices.length ; k+=10){
+                for(var i = 0 ; i < theseCurves.length ; i++){
+                    geo.vertices.push(theseCurves[i].geometry.vertices[k]);
+                    k+=10;
+                }
+            }
+            geo.vertices.unshift(geo.vertices[geo.vertices.length-1].clone());
+
+            var connectorCurve = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xaabbcc}));
+            this.connectors.splice(j,1,connectorCurve);
+
+            this.Curve.add(connectorCurve);
+
+            j++;
         }
 
         this._currentLayer += this._layerStep;
