@@ -145,9 +145,9 @@ function(THREE, noise, Utils, nGon, CastnGon){
             this._currentLayer = 0;
             this.args.counter = 0;
             this.drawFinished = true;
+            this.callDrawFinished();
         } else {
             this.drawFinished = false;
-            this.callDrawFinished();
         }
 
         return this.Curve;
