@@ -1,4 +1,4 @@
-define(["ModelGenerator/interface/GUI"], function(GUI){
+define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 
 	/**
 	 *  enumerable type describing possible ranges
@@ -19,7 +19,7 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 	 *  @type {Number}
 	 *  @const
 	 */
-	var CoreCount = 2;
+	var CoreCount = 1;
 
 	/**
 	 *  the attributes that belong to a single core
@@ -72,7 +72,7 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 		},
 		"sinTri" : {
 			"range" : Range.Normal,
-			"name" : "Sine<->Triangle"	
+			"name" : "Sine/Triangle"
 		},
 		"tpMult" : {
 			"range" : Range.NegativeOne,
@@ -117,17 +117,26 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 
 	function addBaseData(obj){
 		var base = obj.base = {};
+		var folder = GUI.addFolder("Base");
+		folder.open();
 		for (var param in BaseDescription){
-			base[param] = Math.random();
+			var desc = BaseDescription[param];
+			GUI.addSlider(folder, base, param, desc);
 		}
 	}
 
 	function addCoreData(obj, coreCount){
 		var cores = obj.cores = [];
+		var top = GUI.addFolder("Cores");
+		top.open();
 		for (var i = 0; i < coreCount; i++){
 			var core = {};
+			var folder = GUI.addFolder(i, top);
+			folder.open();
 			for (var param in CoreDescription){
-				core[param] = Math.random();
+				core[param] = 0.0;
+				var desc = CoreDescription[param];
+				GUI.addSlider(folder, core, param, desc);
 			}
 			cores.push(core);
 		}
@@ -141,7 +150,6 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 	}
 
 	var obj = createDataObject();
-	console.log(JSON.stringify(obj, undefined, "\t"));
 
 	return obj;
 });
