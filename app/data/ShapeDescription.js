@@ -118,7 +118,7 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 	function addBaseData(obj){
 		var base = obj.base = {};
 		for (var param in BaseDescription){
-			base[param] = Math.random();
+			base[param] = 0;//Math.random()*.02;
 		}
 	}
 
@@ -127,7 +127,7 @@ define(["ModelGenerator/interface/GUI"], function(GUI){
 		for (var i = 0; i < coreCount; i++){
 			var core = {};
 			for (var param in CoreDescription){
-				core[param] = Math.random();
+				core[param] = 0;//Math.random()*.02;
 			}
 			cores.push(core);
 		}

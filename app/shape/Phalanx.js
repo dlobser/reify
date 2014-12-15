@@ -1,47 +1,51 @@
-define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils", 
-    "ModelGenerator/shape/nGon", "ModelGenerator/shape/CastnGon" ], 
-function(THREE, noise, Utils, nGon, CastnGon){
+define(["jquery", "THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils", 
+    "ModelGenerator/shape/nGon", "ModelGenerator/shape/CastnGon" , "ModelGenerator/data/Phalanx",  "ModelGenerator/data/ShapeDescription"], 
+function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
     function Phalanx(params){
 
         var args = params || {};
         this.args = args;
 
+        this.passData = $.extend({}, phalanxData);
+
         this.nGons = [];
-        this.amount = args.amount || 1;
-        this.layers = args.layers || 1;
-        this.layerHeight = args.layerHeight || 0.27;
-        this.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
-        this.args.layers = this.layers;
+        this.ctrls = [];
+        this.connectors = [];
+        this.drawFinishedCallbacks = [];
+
+
+        this.amount = phalanxData.amount || 1;
+        this.layers = phalanxData.layers || 1;
+
+        this.layerHeight = phalanxData.layerHeight || 0.27;
+
+        // this.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
+
+        this.coreData = shapeData.cores;
+
+        // this.counter = args.counter || 0;
+        this.passData.counter = 0;
+
+        // this.args.layers = this.layers;
 
         this.song = args.song || [];
         this.songCurve = new Utils.linearCurve(Utils.arrayToVecs(this.song));
-
-        this.args.songCurve = this.songCurve;
+        this.passData.songCurve = this.songCurve;
 
         this.CTRL = new THREE.Object3D();
 
-        this.ctrls = [];
-
         this.geo = new THREE.Geometry();
         this.mat = new THREE.LineBasicMaterial();
-
         this.Curve = new THREE.Line(this.geo,this.mat);
 
-        this.counter = args.counter || 0;
-        this.args.counter = 0;
-
         this.updateFrequency = 5;
-
         this._currentLayer = 0;
         this._layerStep = 5;
-        this.nGons = [];
-
         this.drawFinished = false;
-        // this.CTRL.add(this.Line);
-        this.drawFinishedCallbacks = [];
 
-        this.connectors = [];
+        // this.CTRL.add(this.Line);
+
     }
 
 
@@ -51,41 +55,29 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
         while(j < this._currentLayer + this._layerStep){
 
-            this.args.counter++;
+            this.passData.counter++;
 
             var theseCurves = [];
 
-            for(var i = 0 ; i < this.amount ; i++){
-
-                // if(typeof this.ctrls[i]=='undefined')
-                //     this.ctrls[i] = new THREE.Object3D();
-
-                // this.args.id = i+1;
-                // this.args.offset = j;
+            for(var i = 0 ; i < phalanxData.amount ; i++){
                
-                
-
-                var a;
+                var passData = $.extend({}, this.passData);
+                var cores = $.extend({}, shapeData.cores);
 
                 if(i==1){
-                    a.data = {};
-                    for(var k in this.args){
-                        var num = this.args[k];
-                        a[k] = num;
-                    }
-                    for(k in this.data[1]){
-                        var num = ((this.data[1][k]+this.data[2][k]));
-                        a.data[k] = num;
+                    passData.data = {};
+                    for(k in cores[0]){
+                        var num = ((info.core0[k]+info.core1[k]));
+                        passData.data[k] = num;
                     }
                 }
                 else{
-                    a = Utils.duplicateObject(this.args);
-                    a.data = this.data[1];
+                    passData.data = info.core0;
                 }
 
-                
+                passData.counter = j;
 
-                var NG = new CastnGon(a);
+                var NG = new CastnGon(passData);
 
                 // this.ctrls[i].add(NG.CTRL);
                 // if(typeof this.nGons[i+j*this.amount] !== 'undefined')
@@ -95,26 +87,19 @@ function(THREE, noise, Utils, nGon, CastnGon){
                     }
                 }
 
-                this.nGons[i+j*this.amount] = (NG);
+                this.nGons[i+j*this.amount] = NG;
 
-                // console.log(NG.testVariable);
-                // var NG = this.CastnGons[this.nGons.length-1];
-                // NG.CTRL.rotation.z = (i/this.amount)*Math.PI*2;
-
-                NG.CTRL.rotation.z += Utils.remap(this.data[0].twist) * j * 0.01;
+                NG.CTRL.rotation.z += info.base.twist * j * 0.01;
                 // NG.CTRL2.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j * 0.01;
-
-                NG.CTRL2.position.y = Utils.remap((this.data[0].offset))*50;
-
+                NG.CTRL2.position.y = (info.base.offset)*50;
                 NG.CTRL.position.z = j*this.layerHeight;
-                NG.init(this.args);
+
+                NG.init(passData);
                 this.Curve.add(NG.Curve);
                 theseCurves.push(NG.Curve);
-
                 
             }
 
-            
 
             if(!Utils.isUndef(this.connectors[j])){
                 Utils.purgeObject(this.connectors[j]);
@@ -141,7 +126,7 @@ function(THREE, noise, Utils, nGon, CastnGon){
 
         this._currentLayer += this._layerStep;
 
-        if(this._currentLayer+this._layerStep > this.layers){
+        if(this._currentLayer+this._layerStep > phalanxData.layers){
             this._currentLayer = 0;
             this.args.counter = 0;
             this.drawFinished = true;

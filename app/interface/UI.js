@@ -1,5 +1,5 @@
-define(["THREE","jquery"], 
-function (THREE,$) {
+define(["THREE","jquery","ModelGenerator/data/ShapeDescription"], 
+function (THREE,$,shapeData) {
 
 
 	var UI = function(args){
@@ -68,6 +68,7 @@ function (THREE,$) {
 			}
 
 			var list = $('<select id="target">').appendTo("#other");
+			
 			for(var i = 0 ; i < this.ctrlArray.length ; i++){
 				var st = ""+this.ctrlArray[i].name;
 				list.append($('<option value="' + this.ctrlArray[i].name + '">').text(st));
