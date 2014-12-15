@@ -1,18 +1,12 @@
 define(["THREE", "ModelGenerator/utils/File", "OrbitControls", "ModelGenerator/interface/GUI", 
 	"ModelGenerator/utils/PerlinNoise", "ModelGenerator/shape/Phalanx", "ModelGenerator/shape/nGon", 
-	"ModelGenerator/data/Songs"], 
-function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs){
+	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils", "ModelGenerator/interface/UI"], 
+function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs, Utils, UI){
 
 	// "use strict";
-	var c = [];
-	var q=-1;
-	for(var i = 0 ; i < 6 ; i++){
-		c[++q] = 75;
-		c[++q] = (i/5)*150;
-		c[++q] = 0;
+	
 
 
-	}
 	/**
 	 *  setup the three.js environment
 	 */
@@ -129,6 +123,39 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
         // Interface.rebuildGui({values:rData,sliders:7});
 
 
+        var ctrlArray = [];
+
+        var keys = Object.keys(buildObject.folders[1].values);
+        console.log(keys);
+	
+		for(var j in keys){
+			var name = keys[j];
+			console.log(keys[j]);
+			var vecs = [];
+			vecs.name = name;
+			// var amt = 4+(Math.round(Math.random()*10)) ;
+			// console.log(amt);
+			var amts=6;
+			for(var i = 0 ; i < amts; i++){
+				var vec = new THREE.Vector3();
+				vec.x = 1;
+				vec.y = (i/(amts-1));
+				vec.z = 0;
+				vecs.push(vec);
+			}
+			ctrlArray.push(vecs);
+		}
+
+		console.log(ctrlArray);
+
+		this.ui = new UI({res:150,ctrlArray:ctrlArray});
+		this.ui.background();
+		this.ui.animate();
+		this.ui.drawVectors();
+
+
+
+
 		this.camera = new THREE.PerspectiveCamera( 30, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({alpha : true});
@@ -157,6 +184,8 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 			passInfo[i] = info[k];
 			i++;
 		}
+
+		passInfo.ctrlArray = ctrlArray;
 		// passInfo[1].arrayData = ui.getVecs();
 
 		// passInfo[0] = info.core0;
@@ -182,6 +211,10 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 		this.controls.update(10);
 		this.renderer.render( this.scene, this.camera );
 
+		this.ui.background();
+		this.ui.drawVectors();
+		this.ui.applyScale();
+
 		//pause now
 		if(!this.paused){
         	this.object = this.phalanx.draw();
@@ -192,14 +225,14 @@ function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs
 	 *  export the model as gcode
 	 */
 	ShapeGenerator.prototype.exportGCode = function(){
-		var layerHeight = this.phalanx.layerHeight;
+		// var layerHeight = this.phalanx.layerHeight;
 		this.phalanx.onFinished(function(phalnx){
 			var verts = [];
 			var children = phalnx.Curve.children;
 			for(var i = 0 ; i < children.length ; i++){
 				verts = verts.concat(children[i].geometry.vertices);
 			}
-			FileUtils.saveGCode([verts], 1, layerHeight);
+			FileUtils.saveGCodeMakerbot([verts], 1);
 		});
 	};
 
