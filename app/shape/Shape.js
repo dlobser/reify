@@ -1,6 +1,6 @@
 define(["THREE", "ModelGenerator/utils/File", "OrbitControls", "ModelGenerator/interface/GUI", 
 	"ModelGenerator/utils/PerlinNoise", "ModelGenerator/shape/Phalanx", "ModelGenerator/shape/nGon", 
-	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils", "ModelGenerator/interface/UI"], 
+	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils", "ModelGenerator/interface/CurveCTRL"], 
 function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs, Utils, UI){
 
 	// "use strict";
