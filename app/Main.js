@@ -11,7 +11,7 @@ require.config({
 		"ModelGenerator" : "../app",
 		"OrbitControls" : "../deps/OrbitControls",
 		"NURBS" : "../deps/NURBS",
-		"dat" : "../deps/dat.gui.min"
+		"dat" : "../deps/dat.gui"
 	},
 	shim : {
 		"THREE" : {
