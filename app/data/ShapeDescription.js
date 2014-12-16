@@ -15,7 +15,7 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 	//////////////////////////////////
 
 	/**
-	 *  The number of cores the object has
+	 *  The number of cores the DataObject has
 	 *  @type {Number}
 	 *  @const
 	 */
@@ -143,13 +143,58 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 	}
 
 	function createDataObject(){
-		var obj = {};
-		addBaseData(obj);
-		addCoreData(obj, CoreCount);
-		return obj;
+		var DataObj = {};
+		addBaseData(DataObj);
+		addCoreData(DataObj, CoreCount);
+		return DataObj;
 	}
 
-	var obj = createDataObject();
+	var DataObj = createDataObject();
 
-	return obj;
+	//////////////////////////////////
+	/// GET THE OBJECT
+	//////////////////////////////////
+
+	function getObject(){
+		var ret = {};
+		ret.base = {};
+		ret.cores = [];
+		getBase(ret.base);
+		getCores(ret.cores);		
+		return ret;
+	}
+
+	function getCores(retObj){
+		var cores = DataObj.cores;
+		for (var i = 0; i < cores.length; i++){
+			var core = cores[i];
+			var coreObj = retObj[i] = {};
+			for (var param in core){
+				var val = core[param];
+				var desc = CoreDescription[param];
+				if (desc.range === Range.NegativeOne){
+					coreObj[param] = Math.abs(val);
+					coreObj[param+"_sign"] = val > 0;
+				} else {
+					coreObj[param] = val;
+				}
+			}
+		}
+	}
+
+	function getBase(retObj){
+		var base = DataObj.base;
+		for (var param in base){
+			var val = base[param];
+			var desc = BaseDescription[param];
+			if (desc.range === Range.NegativeOne){
+				retObj[param] = Math.abs(val);
+				retObj[param+"_sign"] = val > 0;
+			} else {
+				retObj[param] = val;
+			}
+		}
+	}
+
+	return DataObj;
 });
