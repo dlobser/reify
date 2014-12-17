@@ -42,7 +42,7 @@ require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/in
 	"ModelGenerator/data/Dummy"], 
 function(ready, $, ShapeGenerator, Keyboard){
 
-	console.log("Reify Shape Generator v5");
+	console.log("Reify Shape Generator v6");
 
 	var container = $("#Container");
 
