@@ -20,7 +20,27 @@ define(["THREE"],function(THREE){
 				if(i>0){
 					this.vecs[i-1].dist = this.vecs[i-1].distanceTo(this.vecs[i]);
 				}
-			}
+			};
+
+			// this.setDistance = function(arr){
+
+			// 	var num = arr.length/this.vecs.length;
+
+			// 	var distances = [];
+
+			// 	for(var i = 0 ; i < arr.length ; i++){
+			// 		if(i>0){
+			// 			distances[i-1] = arr[i-1].distanceTo(arr[i]);
+			// 		}
+			// 	};
+
+			// 	for(var i = 0 ; i < this.vecs.length ; i++){
+			// 		if(i>0){
+			// 			this.vecs[i-1].cPos = this.lerp(distances[i-1],;
+			// 		}
+			// 	};
+
+			// };
 			
 			this.getLength = function(){
 				for(var i = 0 ; i < this.vecs.length-1 ; i++){
@@ -53,7 +73,7 @@ define(["THREE"],function(THREE){
 				
 				var len = this.lineLength;
 				
-				console.log(this.vecs[0].dist/len);
+				// console.log(this.vecs[0].dist/len);
 				
 				for(var i = 0 ; i < this.vecs.length-1 ; i++){
 					for(var j = 0 ; j < amt ; j++){
@@ -224,6 +244,21 @@ define(["THREE"],function(THREE){
 				out = this.lerp(tri,saw,THREE.Math.mapLinear(l,div,div2,0,1));
 			else
 				out = this.lerp(saw,square,THREE.Math.mapLinear(l,div2,1,0,1));
+
+			return out;
+
+		},
+
+		comboCos:function(t,l){
+
+			var wave = new this.Wave();
+
+			var out = 0;
+
+			var cos = Math.cos(t);
+			var tri = (wave.TriCos(t)*-1);
+			
+			out = this.lerp(cos,tri,l);
 
 			return out;
 

@@ -1,7 +1,7 @@
-define(["THREE", "ModelGenerator/utils/File", "OrbitControls", "ModelGenerator/interface/GUI", 
+define(["THREE", "ModelGenerator/utils/File", "OrbitControls", 
 	"ModelGenerator/utils/PerlinNoise", "ModelGenerator/shape/Phalanx", "ModelGenerator/shape/nGon", 
 	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils", "ModelGenerator/interface/CurveCTRL"], 
-function(THREE, FileUtils, OrbitControls, Interface, noise, Phalanx, nGon, Songs, Utils, UI){
+function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI){
 
 	// "use strict";
 	

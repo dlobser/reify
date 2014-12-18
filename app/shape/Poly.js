@@ -11,7 +11,6 @@ function(THREE, noise, Utils){
 
         //curve vertices
         this.cVerts = [];
-        this.lerpCVerts = [];
 
         this.path = null;
         this.linearCurve = null;
@@ -89,7 +88,15 @@ function(THREE, noise, Utils){
             aim = this.getPointAt(io+off,aData.linearSpline);
 
             if(typeof pos.cPos == 'undefined')
-                pos.cPos = io*this.cVerts.length;
+                pos.cPos = io*this.sides;
+
+            // pos.cPos/=this.sides;
+
+            if(typeof this.originalLinearCurve !== 'undefined'){
+                var point = this.originalLinearCurve.getEvenPointAt(io);
+                pos.dPos = point.cPos;
+                // console.log(pos.dPos);
+            }
 
             base.position = pos;
 
@@ -102,33 +109,11 @@ function(THREE, noise, Utils){
 
             var twist2 = this.counter*(aData.tpTwist2);
             var twist = this.counter*(aData.tpTwist);
-            var petals = Math.floor(aData.tpPetals*15);
+            var petals = Math.floor(aData.tpPetals*15)/(this.lerpCtrlAmount+1);
             var petalMult = ((aData.tpMult) + sinMult);
             var petalLoop = (aData.tpLoop);
             var cornerMult = (aData.tpCornerMult)/2;
-            var cornerCos = ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2);
-
-            var veca = arrayMult*
-                Math.sin(
-                        (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2*
-                        (petals))*
-                    petalMult*5*
-                    Math.max(
-                        (0.5+cornerMult),
-                        cornerCos
-                    );
-
-            var vecb = arrayMult*
-                this.wave.TriSin(
-                        (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2
-                        *(petals))*
-                    petalMult*5*
-                    Math.max(
-                        (0.5+cornerMult),
-                        cornerCos
-                    );
+            var cornerCos = (1+Math.cos(Math.PI+pos.dPos*Math.PI*2))/2;
 
             var vecc = arrayMult*
                 Utils.comboWave(
@@ -144,8 +129,6 @@ function(THREE, noise, Utils){
             // kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
             kid.position.x  = vecc;
 
-
-
             kid.position.z = arrayMult*
                 Math.cos(
                         (twist2*0.5+twist*3)+
@@ -156,6 +139,8 @@ function(THREE, noise, Utils){
                         (0.5+cornerMult),
                         cornerCos
                     );
+
+
 
             var vec = new THREE.Vector3();
             this.CTRL.updateMatrixWorld();

@@ -12,7 +12,10 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
         this.detail = args.detail || 1000;
         this.polySize = args.polySize || 1;
 
-        this.castObjectSides = args.castObjectSides || 3;
+        this.lerpCtrlAmount = args.lerpCtrlAmount || 0;
+        this.lerpCVerts = [];
+
+        this.castObjectSides = args.castObjectSides || 4;
 
         this.castObject = this.makeCastGeo(this.castObjectSides);
         this.caster = new THREE.Raycaster();
@@ -55,7 +58,8 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
         return new THREE.Mesh(sphereGeo,new THREE.MeshLambertMaterial(  ));
 
-    }
+    };
+
 
     CastnGon.prototype.makeSimplePoly = function(){
 
@@ -72,7 +76,18 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            var sc = (1+this.args.data.bpSize);
+            var off = (this.counter/this.args.layers)*Math.PI*2*info.var7+(info.var8*(1+Math.abs(info.var7*Math.PI)));
+
+            if(off<0)
+                off=0;
+            if(off>Math.PI*2)
+                off=Math.PI*2;
+
+            var bulge = (1+Utils.comboCos(off,info.var10))/2;
+            bulge*=-1;
+            bulge+=1;
+
+            var sc = (1+this.args.data.bpSize)+bulge*info.var9*-1;
 
             this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
@@ -97,6 +112,56 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
             this.cVerts.push(r);
         }
+
+        if(this.lerpCtrlAmount>0){
+
+            if(typeof this.originalCVerts == 'undefined'){
+                this.originalCVerts = [];
+                for(var i = 0 ; i < this.cVerts.length ; i++){
+                    this.originalCVerts.push(this.cVerts[i].clone());
+                }
+                this.originalLinearCurve = new Utils.linearCurve(this.originalCVerts,this.closed);
+            }
+
+            var newCVerts = [];
+
+            for(var j = 0 ; j < this.cVerts.length+1 ; j++){
+
+                if(j>0){
+                    for(var i = 1 ; i < this.lerpCtrlAmount+1 ; i++){
+
+                        if(j<this.cVerts.length)
+                            var tVert = this.cVerts[j].clone();
+                        else
+                            var tVert = this.cVerts[0].clone();
+
+                        var pVert = this.cVerts[j-1].clone();
+                        pVert.lerp(tVert,i/(this.lerpCtrlAmount+1));
+
+                        //move the points around
+
+                        var offset = Utils.comboWave(((i*info.var4)+this.counter*info.var3),info.var5/3);
+                        var offset2 = Utils.comboWave(this.counter*info.var4b,info.var5/3);
+
+
+                        pVert.multiplyScalar(1+info.var2*offset+(offset2*info.var4c));
+
+                        this.lerpCVerts.push(pVert);
+                        newCVerts.push(pVert);
+                    }
+                }
+
+                if(j<this.cVerts.length)
+                    newCVerts.push(this.cVerts[j].clone());
+                // else
+                //     newCVerts.push(this.cVerts[0].clone());
+
+            }
+
+            this.cVerts = newCVerts;
+        }
+
+        // console.log(this.cVerts);
 
     };
 
