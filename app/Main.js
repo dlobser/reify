@@ -38,10 +38,11 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard"], 
+require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard", 
+	"ModelGenerator/data/Dummy"], 
 function(ready, $, ShapeGenerator, Keyboard){
 
-	console.log("Reify Shape Generator v5");
+	console.log("Reify Shape Generator v6");
 
 	var container = $("#Container");
 
