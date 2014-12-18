@@ -168,10 +168,16 @@ define(["THREE"],function(THREE){
 				new THREE.Vector3(Math.PI,-1,0),
 				new THREE.Vector3(Math.PI*2,-1,0),
 			];
+			this.sawPoints = [
+				new THREE.Vector3(0,-1,0),
+				new THREE.Vector3(0,1,0),
+				new THREE.Vector3(Math.PI*2,-1,0),
+			];
 
 			this.cosCurve = new linearCurve(this.cosPoints);
 			this.sinCurve = new linearCurve(this.sinPoints);
 			this.squareCurve = new linearCurve(this.squarePoints);
+			this.sawCurve = new linearCurve(this.sawPoints);
 
 			this.TriCos = function(t){
 
@@ -189,7 +195,38 @@ define(["THREE"],function(THREE){
 
 				return this.squareCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
 
-			}
+			};
+
+			this.Saw = function(t){
+
+				return this.sawCurve.getPointAt((t%(Math.PI*2))/(Math.PI*2)).y;
+
+			};
+		},
+
+		comboWave:function(t,l){
+
+			var wave = new this.Wave();
+
+			var out = 0;
+
+			var sin = Math.sin(t);
+			var tri = wave.TriSin(t);
+			var saw = wave.Saw(t);
+			var square = wave.Square(t);
+
+			var div = 1/3;
+			var div2 = 2/3;
+
+			if(l<div)
+				out = this.lerp(sin,tri,THREE.Math.mapLinear(l,0,div,0,1));
+			else if(l>div&&l<div2)
+				out = this.lerp(tri,saw,THREE.Math.mapLinear(l,div,div2,0,1));
+			else
+				out = this.lerp(saw,square,THREE.Math.mapLinear(l,div2,1,0,1));
+
+			return out;
+
 		},
 
 		extend:function(child, parent){
@@ -481,8 +518,6 @@ define(["THREE"],function(THREE){
 			var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
 			saveAs(blob, name);
 		},
-
-
 
 		makeFrame:function(size){
 

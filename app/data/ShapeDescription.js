@@ -106,7 +106,7 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 			"name" : "Twist"	
 		},
 		"offset" : {
-			"range" : Range.Normal,
+			"range" : Range.NegativeOne,
 			"name" : "Offset"
 		},
 	};

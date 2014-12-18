@@ -11,6 +11,8 @@ function(THREE, noise, Utils){
 
         //curve vertices
         this.cVerts = [];
+        this.lerpCVerts = [];
+
         this.path = null;
         this.linearCurve = null;
         this.splineCurve = null;
@@ -59,6 +61,126 @@ function(THREE, noise, Utils){
 
         return this.linearCurve.getEvenPointAt(theta).lerp(this.splineCurve.getPointAt(theta),val);
 
+    };
+
+    Poly.prototype.turtle = function(){
+
+        var base = new THREE.Object3D();
+        var kid = new THREE.Object3D();
+        base.add(kid);
+        this.CTRL2.add(base);
+
+        var aData = this.args.data;
+
+        var verts = [];
+
+        for(var i = 0 ; i < this.detail ; i++){
+
+            var io = i/(this.detail);
+
+            var pos,aim;
+
+            var off = 0.0001;
+
+            // if(io+off>1)
+            //     off=0;
+
+            pos = this.getPointAt(io,aData.linearSpline);
+            aim = this.getPointAt(io+off,aData.linearSpline);
+
+            if(typeof pos.cPos == 'undefined')
+                pos.cPos = io*this.cVerts.length;
+
+            base.position = pos;
+
+            base.lookAt(aim);
+            base.up = new THREE.Vector3(0,0,1);
+
+            var sinMult = 0;//(aData.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
+
+            var arrayMult = 1;//aData.arrayData.getPointAt(this.args.offset/this.args.layers).x;
+
+            var twist2 = this.counter*(aData.tpTwist2);
+            var twist = this.counter*(aData.tpTwist);
+            var petals = Math.floor(aData.tpPetals*15);
+            var petalMult = ((aData.tpMult) + sinMult);
+            var petalLoop = (aData.tpLoop);
+            var cornerMult = (aData.tpCornerMult)/2;
+            var cornerCos = ((Math.cos(Math.PI+pos.cPos*Math.PI*2)+1)/2);
+
+            var veca = arrayMult*
+                Math.sin(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2*
+                        (petals))*
+                    petalMult*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+            var vecb = arrayMult*
+                this.wave.TriSin(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2
+                        *(petals))*
+                    petalMult*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+            var vecc = arrayMult*
+                Utils.comboWave(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2
+                        *(petals),aData.sinTri)*
+                    petalMult*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+            // kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
+            kid.position.x  = vecc;
+
+
+
+            kid.position.z = arrayMult*
+                Math.cos(
+                        (twist2*0.5+twist*3)+
+                        pos.cPos*Math.PI*2
+                        *(petals))*
+                    petalLoop*5*
+                    Math.max(
+                        (0.5+cornerMult),
+                        cornerCos
+                    );
+
+            var vec = new THREE.Vector3();
+            this.CTRL.updateMatrixWorld();
+            base.updateMatrixWorld();
+            vec.setFromMatrixPosition(kid.matrixWorld);
+            vec.t = pos.cPos;
+
+            if(i===0){
+                verts["id"+pos.cPos] = i;
+            }
+            if(pos.cPos/Math.floor(pos.cPos)==1){
+                verts["id"+pos.cPos] = i;
+            }
+
+            vec.z=this.CTRL.position.z;
+
+            //this is a problem
+            if(i>0)
+                verts.push(vec);
+
+        }
+
+        this.geo.vertices = verts;
+
+        this.CTRL.remove(base);
     };
 
     Poly.prototype._makeLinearCurve = function(){

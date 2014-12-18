@@ -59,7 +59,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
             var theseCurves = [];
 
-            for(var i = 0 ; i < phalanxData.amount ; i++){
+            for(var i = 0 ; i < 1 ; i++){
                
                 var passData = $.extend({}, this.passData);
                 var cores = $.extend({}, shapeData.cores);
@@ -67,12 +67,12 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
                 if(i==1){
                     passData.data = {};
                     for(k in cores[0]){
-                        var num = ((info.core0[k]+info.core1[k]));
+                        var num = ((shapeData.cores[0][k]+shapeData.cores[1][k]));
                         passData.data[k] = num;
                     }
                 }
                 else{
-                    passData.data = info.core0;
+                    passData.data = shapeData.cores[0];
                 }
 
                 passData.counter = j;
@@ -89,9 +89,9 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
                 this.nGons[i+j*this.amount] = NG;
 
-                NG.CTRL.rotation.z += info.base.twist * j * 0.01;
+                NG.CTRL.rotation.z += shapeData.base.twist * j * 0.01;
                 // NG.CTRL2.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j * 0.01;
-                NG.CTRL2.position.y = (info.base.offset)*50;
+                NG.CTRL2.position.y = (shapeData.base.offset)*50;
                 NG.CTRL.position.z = j*this.layerHeight;
 
                 NG.init(passData);
@@ -101,25 +101,25 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
             }
 
 
-            if(!Utils.isUndef(this.connectors[j])){
-                Utils.purgeObject(this.connectors[j]);
-                // this.connectors[j]=null;
-            }
+            // if(!Utils.isUndef(this.connectors[j])){
+            //     Utils.purgeObject(this.connectors[j]);
+            //     // this.connectors[j]=null;
+            // }
 
-            var geo = new THREE.Geometry();
+            // var geo = new THREE.Geometry();
 
-            for(var k = 0 ; k < theseCurves[0].geometry.vertices.length ; k+=10){
-                for(var i = 0 ; i < theseCurves.length ; i++){
-                    geo.vertices.push(theseCurves[i].geometry.vertices[k]);
-                    k+=10;
-                }
-            }
-            geo.vertices.unshift(geo.vertices[geo.vertices.length-1].clone());
+            // for(var k = 0 ; k < theseCurves[0].geometry.vertices.length ; k+=10){
+            //     for(var i = 0 ; i < theseCurves.length ; i++){
+            //         geo.vertices.push(theseCurves[i].geometry.vertices[k]);
+            //         k+=10;
+            //     }
+            // }
+            // geo.vertices.unshift(geo.vertices[geo.vertices.length-1].clone());
 
-            var connectorCurve = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xaabbcc}));
-            this.connectors.splice(j,1,connectorCurve);
+            // var connectorCurve = new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xaabbcc}));
+            // this.connectors.splice(j,1,connectorCurve);
 
-            this.Curve.add(connectorCurve);
+            // this.Curve.add(connectorCurve);
 
             j++;
         }
