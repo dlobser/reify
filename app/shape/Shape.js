@@ -236,6 +236,13 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI
 		});
 	};
 
+	ShapeGenerator.prototype.saveData = function(){
+		// var layerHeight = this.phalanx.layerHeight;
+		this.phalanx.onFinished(function(phalnx){
+			console.log(JSON.stringify(phalnx.shapeData))
+		});
+	};
+
 	/**
 	 *  pauses the animation. wait until the phalanx is generated before pausing
 	 */

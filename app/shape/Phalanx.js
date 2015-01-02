@@ -22,6 +22,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
         // this.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
 
+        this.shapeData = shapeData;
         this.coreData = shapeData.cores;
 
         // this.counter = args.counter || 0;
@@ -140,7 +141,8 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
         }
 
         return this.Curve;
-    };   
+    };
+
 
     /**
      *  get the object. it'll wait until the object is
