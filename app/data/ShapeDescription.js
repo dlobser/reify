@@ -232,5 +232,22 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 		}
 	}
 
+	function setData(data, parent){
+		if (!parent){
+			parent = DataObj;
+		}
+		for (var attr in data){
+			if (parent.hasOwnProperty(attr)){
+				if (typeof data[attr] === "object"){
+					setData(data[attr], parent[attr]);
+				} else {
+					parent[attr] = data[attr];
+				}
+			}
+		}
+	}
+
+	DataObj.set = setData;
+	
 	return DataObj;
 });

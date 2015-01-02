@@ -23,7 +23,7 @@ define(["domReady!", "dat", "jquery"], function(ready, dat, $){
 			min = -1;
 		}
 		object[name] = 0.01; 
-		var controller = folder.add(object, name, min, max).name(description.name);
+		var controller = folder.add(object, name, min, max).name(description.name).listen();
 		controller.setValue(0);
 	}
 
