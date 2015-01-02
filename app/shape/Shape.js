@@ -156,7 +156,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI
 
 
 
-		this.camera = new THREE.PerspectiveCamera( 30, width / height, 1, 20000 );
+		this.camera = new THREE.PerspectiveCamera( 60, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({alpha : true});
 		this.renderer.setClearColor( 0x112233, 1);
@@ -165,7 +165,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI
 
 		container.append(this.renderer.domElement);
 
-		this.camera.position.z = 300;
+		this.camera.position.z = 70;
 		this.camera.lookAt(new THREE.Vector3 (0.0, 0.0, 0.0));
 		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement);
 
@@ -180,10 +180,10 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI
 		var passInfo = [];
 
 		var i = 0 ;
-		for(var k in info){
-			passInfo[i] = info[k];
-			i++;
-		}
+		// for(var k in info){
+		// 	passInfo[i] = info[k];
+		// 	i++;
+		// }
 
 		passInfo.ctrlArray = ctrlArray;
 		// passInfo[1].arrayData = ui.getVecs();
@@ -197,7 +197,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, UI
 		// this.scene.add(sp);
 		// this.makeShape();
 		// 
-		this.phalanx = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:200,polySize:20,detail:500, song:Songs.song});
+		this.phalanx = new Phalanx({data:passInfo,amount:amt,curveType:"spline",layers:400,polySize:30,detail:500, song:Songs.song});
 		this.scene.add(this.phalanx.Curve);
 		this.animate();
 	};

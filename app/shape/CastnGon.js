@@ -63,6 +63,8 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
     CastnGon.prototype.makeSimplePoly = function(){
 
+        var aData = this.args.data;
+
         for(var i = 0 ; i < this.sides ; i++){
 
             var c = (this.args.data.bpTwist)*this.counter*0.01;// this.counter*.01;
@@ -76,26 +78,32 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            var off = (this.counter/this.args.layers)*Math.PI*2*info.var7+(info.var8*(1+Math.abs(info.var7*Math.PI)));
+            // var off = (this.counter/this.args.layers)*Math.PI*6*aData.bulgeFreq+(aData.bulgeOff*1.5*(Math.abs((1+aData.bulgeFreq)*Math.PI*6)));
+
+            var off = ( ( this.counter / this.args.layers ) ) * ( aData.bulgeFreq * 2 );
+            off -= (aData.bulgeOff * (aData.bulgeFreq * 2) );
+            off += 0.5;
+
+            off *= Math.PI*2;
 
             if(off<0)
                 off=0;
             if(off>Math.PI*2)
                 off=Math.PI*2;
 
-            var bulge = (1+Utils.comboCos(off,info.var10))/2;
+            var bulge = (1+Utils.comboCos(off,aData.bulgeSinTri))/2;
             bulge*=-1;
             bulge+=1;
 
-            var sc = (1+this.args.data.bpSize)+bulge*info.var9*-1;
+            var sc = (1+this.args.data.bpSize)+bulge*aData.bulgeAmount;
 
             this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
-            this.castObject.rotation.x=(this.args.data.cbTwistX)*this.counter*0.02*((this.args.data.cbTwist)*3);
-            this.castObject.rotation.y=(this.args.data.cbTwistY)*this.counter*0.02*((this.args.data.cbTwist)*3);
-            this.castObject.rotation.z=(this.args.data.cbTwistZ)*this.counter*0.02*((this.args.data.cbTwist)*3);
+            this.castObject.rotation.x=1*this.counter*0.01*((this.args.data.cbTwist)*2);
+            this.castObject.rotation.y=1*this.counter*0.01*((this.args.data.cbTwist)*2);
+            this.castObject.rotation.z=1*this.counter*0.01*((this.args.data.cbTwist)*2);
 
-            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*0.5)*5*this.args.data.cbWobbleMult;
+            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*0.1)*8*this.args.data.cbWobbleMult;
 
             this.castObject.updateMatrixWorld();
 
@@ -140,11 +148,11 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
                         //move the points around
 
-                        var offset = Utils.comboWave(((i*info.var4)+this.counter*info.var3),info.var5/3);
-                        var offset2 = Utils.comboWave(this.counter*info.var4b,info.var5/3);
+                        var offset = Utils.comboWave(((i*aData.xtraXWaveFreq*Math.PI*2)+this.counter*aData.xtraZWaveFreq*.2),aData.xtraSinTri*0.3331);
+                        var offset2 = Utils.comboWave(.3*this.counter*aData.xtraBulgeFreq,aData.xtraSinTri*0.3331);
 
 
-                        pVert.multiplyScalar(1+info.var2*offset+(offset2*info.var4c));
+                        pVert.multiplyScalar(1+(aData.xtraWaveMult*.5)*offset+(offset2*aData.xtraBulgeAmount));
 
                         this.lerpCVerts.push(pVert);
                         newCVerts.push(pVert);

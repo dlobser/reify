@@ -77,7 +77,8 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
                 passData.counter = j;
 
-                passData.lerpCtrlAmount = Math.floor(1+(info.var1*10));
+
+                passData.lerpCtrlAmount = Math.floor(1+(shapeData.cores[0].xtraControls*10));
                 passData.layers = phalanxData.layers;
 
                 var NG = new CastnGon(passData);
@@ -94,7 +95,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData){
 
                 NG.CTRL.rotation.z += shapeData.base.twist * j * 0.01;
                 // NG.CTRL2.rotation.z += Utils.remap(this.data[0]["twist"+i]) * j * 0.01;
-                NG.CTRL2.position.y = (j*j*info.var6*.001)+(shapeData.base.offset)*50;
+                NG.CTRL2.position.y = (j*j*shapeData.cores[0].lean*.001)+(shapeData.base.offset)*50;
                 NG.CTRL.position.z = j*this.layerHeight;
 
                 NG.init(passData);

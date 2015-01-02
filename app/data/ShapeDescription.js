@@ -44,19 +44,7 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 		},
 		"cbTwist" : {
 			"range" : Range.NegativeOne,
-			"name" : "cbTwist"	
-		},
-		"cbTwistX" : {
-			"range" : Range.NegativeOne,
-			"name" : "cbTwistX"	
-		},
-		"cbTwistY" : {
-			"range" : Range.NegativeOne,
-			"name" : "cbTwistY"	
-		},
-		"cbTwistZ" : {
-			"range" : Range.NegativeOne,
-			"name" : "cbTwistZ"	
+			"name" : "Cube Twist"	
 		},
 		"cbWobbleMult" : {
 			"range" : Range.Normal,
@@ -76,23 +64,71 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 		},
 		"tpMult" : {
 			"range" : Range.NegativeOne,
-			"name" : "Turtle Mult"	
+			"name" : "Turtle Mult"
 		},
 		"tpLoop" : {
 			"range" : Range.NegativeOne,
-			"name" : "Turtle Loop"	
+			"name" : "Turtle Loop"
 		},
 		"tpTwist" : {
 			"range" : Range.NegativeOne,
-			"name" : "Turtle Twist"	
+			"name" : "Turtle Twist"
 		},
 		"tpTwist2" : {
 			"range" : Range.NegativeOne,
-			"name" : "Turtle Twist 2"	
+			"name" : "Turtle Twist 2"
 		},
 		"tpCornerMult" : {
 			"range" : Range.NegativeOne,
-			"name" : "Corner Mult"	
+			"name" : "Corner Mult"
+		},
+		"xtraControls" : {
+			"range" : Range.Normal,
+			"name" : "x Controls"
+		},
+		"xtraWaveMult" : {
+			"range" : Range.NegativeOne,
+			"name" : "x Multiply"
+		},
+		"xtraZWaveFreq" : {
+			"range" : Range.Normal,
+			"name" : "x ZFrequency"
+		},
+		"xtraXWaveFreq" : {
+			"range" : Range.Normal,
+			"name" : "x XFrequency"
+		},
+		"xtraBulgeAmount" : {
+			"range" : Range.Normal,
+			"name" : "x Bulge Amount"
+		},
+		"xtraBulgeFreq" : {
+			"range" : Range.Normal,
+			"name" : "x Bulge Freq"
+		},
+		"xtraSinTri" : {
+			"range" : Range.Normal,
+			"name" : "x WaveType"
+		},
+		"bulgeAmount" : {
+			"range" : Range.NegativeOne,
+			"name" : "Bulge Amount"
+		},
+		"bulgeFreq" : {
+			"range" : Range.NegativeOne,
+			"name" : "Bulge Frequency"
+		},
+		"bulgeOff" : {
+			"range" : Range.Normal,
+			"name" : "Bulge Offset"
+		},
+		"bulgeSinTri" : {
+			"range" : Range.Normal,
+			"name" : "Bulge Wave Type"
+		},
+		"lean" : {
+			"range" : Range.NegativeOne,
+			"name" : "Lean"
 		},
 	};
 
