@@ -5,11 +5,22 @@
 	<link rel="stylesheet" type="text/css" href="./style/main.css">
 </head>
 <body>
+	<div style="z-index:1000">
+		<form action="">
+		<textarea name="myTextBox" cols="50" rows="5">
+		Enter some text...
+		</textarea>
+		<br />
+		<input type="submit" />
+		</form>
+	</div>
 
 	<script data-main="./app/Main.js" type="text/javascript" src="./deps/require.js"></script>
 	<div id="Container"></div>
 	<div id="canvasDiv"></div>
 	<div id="other"></div>
-	<div style="position:relative;color:#ffffff"><br><br>e: save data<br>t: apply data<br>r: toggle animation<br>4: write gcode<br></div>
+	<div style="position:relative;color:#ffffff"><br><br>s: save data<br>r: apply data<br>a: toggle animation<br>4: write gcode<br></div>
+
+	
 </body>
 </html>

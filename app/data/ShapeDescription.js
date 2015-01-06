@@ -30,6 +30,10 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 			"range" : Range.Normal,
 			"name" : "Linear Spline"
 		},
+		"baseTwist" : {
+			"range" : Range.NegativeOne,
+			"name" : "Base Twist"	
+		},
 		"bpSides" : {
 			"range" : Range.Normal,
 			"name" : "Side Count",
@@ -46,14 +50,14 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 			"range" : Range.NegativeOne,
 			"name" : "Cube Twist"	
 		},
-		"cbWobbleMult" : {
-			"range" : Range.Normal,
-			"name" : "Wobble Mult"	
-		},
-		"cbWobbleFreq" : {
-			"range" : Range.Normal,
-			"name" : "Wobble Freq"	
-		},
+		// "cbWobbleMult" : {
+		// 	"range" : Range.Normal,
+		// 	"name" : "Wobble Mult"	
+		// },
+		// "cbWobbleFreq" : {
+		// 	"range" : Range.Normal,
+		// 	"name" : "Wobble Freq"	
+		// },
 		"tpPetals" : {
 			"range" : Range.Normal,
 			"name" : "Petal Count"	
@@ -72,50 +76,50 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 		},
 		"tpTwist" : {
 			"range" : Range.NegativeOne,
-			"name" : "Turtle Twist"
+			"name" : "Turtle Weave"
 		},
 		"tpTwist2" : {
 			"range" : Range.NegativeOne,
 			"name" : "Turtle Twist 2"
 		},
 		"tpCornerMult" : {
-			"range" : Range.NegativeOne,
+			"range" : Range.Normal,
 			"name" : "Corner Mult"
 		},
 		"xtraControls" : {
 			"range" : Range.Normal,
-			"name" : "x Controls"
+			"name" : "subDiv Controls"
 		},
 		"xtraWaveMult" : {
 			"range" : Range.NegativeOne,
-			"name" : "x Multiply"
+			"name" : "subDiv Multiply"
 		},
 		"xtraZWaveFreq" : {
 			"range" : Range.Normal,
-			"name" : "x ZFrequency"
+			"name" : "subDiv ZFrequency"
 		},
 		"xtraXWaveFreq" : {
 			"range" : Range.Normal,
-			"name" : "x XFrequency"
+			"name" : "subDiv XFrequency"
 		},
 		"xtraBulgeAmount" : {
 			"range" : Range.Normal,
-			"name" : "x Bulge Amount"
+			"name" : "subDiv Bulge Amount"
 		},
 		"xtraBulgeFreq" : {
 			"range" : Range.Normal,
-			"name" : "x Bulge Freq"
+			"name" : "subDiv Bulge Freq"
 		},
 		"xtraSinTri" : {
 			"range" : Range.Normal,
-			"name" : "x WaveType"
+			"name" : "subDiv WaveType"
 		},
 		"bulgeAmount" : {
 			"range" : Range.NegativeOne,
 			"name" : "Bulge Amount"
 		},
 		"bulgeFreq" : {
-			"range" : Range.NegativeOne,
+			"range" : Range.Normal,
 			"name" : "Bulge Frequency"
 		},
 		"bulgeOff" : {
@@ -137,14 +141,14 @@ define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
 	 *  @type {Object}
 	 */
 	var BaseDescription = {
-		"twist" : {
-			"range" : Range.NegativeOne,
-			"name" : "Twist"	
-		},
-		"offset" : {
-			"range" : Range.NegativeOne,
-			"name" : "Offset"
-		},
+		// "twist" : {
+		// 	"range" : Range.NegativeOne,
+		// 	"name" : "Twist"	
+		// },
+		// "offset" : {
+		// 	"range" : Range.NegativeOne,
+		// 	"name" : "Offset"
+		// },
 	};
 
 	//////////////////////////////////

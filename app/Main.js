@@ -48,20 +48,19 @@ function(ready, $, ShapeGenerator, Keyboard){
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
 	//key bindings
-	Keyboard.bindKey("r", function(){
-		if (generator.paused){
-			generator.pauseAnimation(false);
-		} else {
-			generator.pauseAnimation(true);
-		}
+	Keyboard.bindKey("a", function(){
+		generator.phalanx.pauseAnimation();
 	});
 
 	Keyboard.bindKey("4", function(){
-		generator.exportGCode();
+		generator.phalanx.exportGCode();
 	});
 
-	Keyboard.bindKey("e", function(){
-		generator.saveData();
+	Keyboard.bindKey("s", function(){
+		generator.phalanx.saveData();
+	});
+	Keyboard.bindKey("r", function(){
+		generator.phalanx.setData(data);
 	});
 	
 });

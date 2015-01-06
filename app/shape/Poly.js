@@ -81,62 +81,51 @@ function(THREE, noise, Utils){
 
             var off = 0.0001;
 
-            // if(io+off>1)
-            //     off=0;
-
             pos = this.getPointAt(io,aData.linearSpline);
             aim = this.getPointAt(io+off,aData.linearSpline);
 
             if(typeof pos.cPos == 'undefined')
                 pos.cPos = io*this.sides;
 
-            // pos.cPos/=this.sides;
-
             if(typeof this.originalLinearCurve !== 'undefined'){
                 var point = this.originalLinearCurve.getEvenPointAt(io);
                 pos.dPos = point.cPos;
-                // console.log(pos.dPos);
             }
+            else
+                pos.dPos = pos.cPos;
 
             base.position = pos;
 
             base.lookAt(aim);
             base.up = new THREE.Vector3(0,0,1);
 
-            var sinMult = 0;//(aData.songMult * this.args.songCurve.getPointAt(this.counter/this.args.layers).y);
-
-            var arrayMult = 1;//aData.arrayData.getPointAt(this.args.offset/this.args.layers).x;
-
-            var twist2 = this.counter*(aData.tpTwist2);
-            var twist = this.counter*(aData.tpTwist);
-            var petals = Math.floor(aData.tpPetals*15)/(this.lerpCtrlAmount+1);
-            var petalMult = ((aData.tpMult) + sinMult);
-            var petalLoop = (aData.tpLoop);
-            var cornerMult = (aData.tpCornerMult)/2;
+            var twist2 = this.counter*(aData.tpTwist2*0.5);
+            var twist = this.counter*Math.PI*(Math.round(aData.tpTwist));
+            var petals = Math.floor(aData.tpPetals*8)/(this.lerpCtrlAmount+1);
+            var petalMult = aData.tpMult;
+            var petalLoop = aData.tpLoop;
+            var cornerMult = aData.tpCornerMult;
             var cornerCos = (1+Math.cos(Math.PI+pos.dPos*Math.PI*2))/2;
 
-            var vecc = arrayMult*
-                Utils.comboWave(
+            var vecc = Utils.comboWave(
                         (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2
-                        *(petals),aData.sinTri)*
+                        pos.cPos*Math.PI*2*
+                        (petals),aData.sinTri)*
                     petalMult*5*
                     Math.max(
-                        (0.5+cornerMult),
+                        (cornerMult),
                         cornerCos
                     );
 
-            // kid.position.x  = Utils.lerp(veca,vecb,aData.sinTri);
             kid.position.x  = vecc;
 
-            kid.position.z = arrayMult*
-                Math.cos(
+            kid.position.z = Math.cos(
                         (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2
-                        *(petals))*
+                        pos.cPos*Math.PI*2*
+                        (petals))*
                     petalLoop*5*
                     Math.max(
-                        (0.5+cornerMult),
+                        (cornerMult),
                         cornerCos
                     );
 
@@ -157,7 +146,6 @@ function(THREE, noise, Utils){
 
             vec.z=this.CTRL.position.z;
 
-            //this is a problem
             if(i>0)
                 verts.push(vec);
 
@@ -188,7 +176,7 @@ function(THREE, noise, Utils){
         for(var i = 0 ; i < this.geo.vertices.length ; i++){
             var c2 = new THREE.Color((2+Math.sin(i*0.1))/5,(2+Math.cos(2+i*0.1))/5,(2+Math.sin(1+i*0.1))/5);
             var v = this.geo.vertices[i];
-            var c = .3+noise(v.x*0.3,v.y*0.3,v.z*0.3)/2;
+            var c = 0.3+noise(v.x*0.3,v.y*0.3,v.z*0.3)/2;
             this.geo.colors[i] = new THREE.Color(c+c2.r,c+c2.g,c+c2.b);
         }
 

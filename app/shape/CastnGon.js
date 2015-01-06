@@ -8,7 +8,7 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
         this.args = params || {};
         this.closed = true;
         this.args.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
-        this.sides = Math.max(3,3 + Math.floor(this.args.data.bpSides*15));
+        this.sides = Math.max(3,3 + (Math.floor(this.args.data.bpSides*10)));
         this.detail = args.detail || 1000;
         this.polySize = args.polySize || 1;
 
@@ -33,6 +33,7 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
         this.turtle();
         this.makeObject();
 
+        //if you want to see what the object is doing
         // this.Curve.add(this.castObject);
 
         return this.Curve;
@@ -67,7 +68,7 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
         for(var i = 0 ; i < this.sides ; i++){
 
-            var c = (this.args.data.bpTwist)*this.counter*0.01;// this.counter*.01;
+            var c = (this.args.data.bpTwist)*this.counter*0.005;
 
             var vec = new THREE.Vector3(
                     Math.sin(c+(i/this.sides*Math.PI*2))*1e6,
@@ -78,10 +79,8 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            // var off = (this.counter/this.args.layers)*Math.PI*6*aData.bulgeFreq+(aData.bulgeOff*1.5*(Math.abs((1+aData.bulgeFreq)*Math.PI*6)));
-
-            var off = ( ( this.counter / this.args.layers ) ) * ( aData.bulgeFreq * 2 );
-            off -= (aData.bulgeOff * (aData.bulgeFreq * 2) );
+            var off = ( ( this.counter / this.args.layers ) ) * ( aData.bulgeFreq  );
+            off -= (aData.bulgeOff * (aData.bulgeFreq ) );
             off += 0.5;
 
             off *= Math.PI*2;
@@ -95,15 +94,15 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
             bulge*=-1;
             bulge+=1;
 
-            var sc = (1+this.args.data.bpSize)+bulge*aData.bulgeAmount;
+            var sc = (1+(this.args.data.bpSize)*0.5)+bulge*aData.bulgeAmount*0.5;
 
             this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
-            this.castObject.rotation.x=1*this.counter*0.01*((this.args.data.cbTwist)*2);
-            this.castObject.rotation.y=1*this.counter*0.01*((this.args.data.cbTwist)*2);
-            this.castObject.rotation.z=1*this.counter*0.01*((this.args.data.cbTwist)*2);
+            this.castObject.rotation.x=1*this.counter*0.005*((this.args.data.cbTwist));
+            this.castObject.rotation.y=1*this.counter*0.005*((this.args.data.cbTwist));
+            this.castObject.rotation.z=1*this.counter*0.005*((this.args.data.cbTwist));
 
-            this.castObject.position.z=Math.sin(this.counter*this.args.data.cbWobbleFreq*0.1)*8*this.args.data.cbWobbleMult;
+            this.castObject.position.z=0;
 
             this.castObject.updateMatrixWorld();
 
@@ -121,38 +120,39 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
             this.cVerts.push(r);
         }
 
-        if(this.lerpCtrlAmount>0){
-
-            if(typeof this.originalCVerts == 'undefined'){
+         if(typeof this.originalCVerts == 'undefined'){
                 this.originalCVerts = [];
-                for(var i = 0 ; i < this.cVerts.length ; i++){
+                for(i = 0 ; i < this.cVerts.length ; i++){
                     this.originalCVerts.push(this.cVerts[i].clone());
                 }
                 this.originalLinearCurve = new Utils.linearCurve(this.originalCVerts,this.closed);
             }
+
+        if(this.lerpCtrlAmount>0){
 
             var newCVerts = [];
 
             for(var j = 0 ; j < this.cVerts.length+1 ; j++){
 
                 if(j>0){
-                    for(var i = 1 ; i < this.lerpCtrlAmount+1 ; i++){
+                    for(i = 1 ; i < this.lerpCtrlAmount+1 ; i++){
+
+                        var tVert;
 
                         if(j<this.cVerts.length)
-                            var tVert = this.cVerts[j].clone();
+                            tVert = this.cVerts[j].clone();
                         else
-                            var tVert = this.cVerts[0].clone();
+                            tVert = this.cVerts[0].clone();
 
                         var pVert = this.cVerts[j-1].clone();
                         pVert.lerp(tVert,i/(this.lerpCtrlAmount+1));
 
                         //move the points around
 
-                        var offset = Utils.comboWave(((i*aData.xtraXWaveFreq*Math.PI*2)+this.counter*aData.xtraZWaveFreq*.2),aData.xtraSinTri*0.3331);
-                        var offset2 = Utils.comboWave(.3*this.counter*aData.xtraBulgeFreq,aData.xtraSinTri*0.3331);
+                        var offset = Utils.comboWave(((i*aData.xtraXWaveFreq*Math.PI*2)+this.counter*aData.xtraZWaveFreq*0.05),aData.xtraSinTri*0.3331);
+                        var offset2 = Utils.comboWave(0.05*this.counter*aData.xtraBulgeFreq,aData.xtraSinTri*0.3331);
 
-
-                        pVert.multiplyScalar(1+(aData.xtraWaveMult*.5)*offset+(offset2*aData.xtraBulgeAmount));
+                        pVert.multiplyScalar(1+(aData.xtraWaveMult*0.25)*offset+(offset2*aData.xtraBulgeAmount*0.25));
 
                         this.lerpCVerts.push(pVert);
                         newCVerts.push(pVert);
@@ -161,15 +161,12 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
                 if(j<this.cVerts.length)
                     newCVerts.push(this.cVerts[j].clone());
-                // else
-                //     newCVerts.push(this.cVerts[0].clone());
 
             }
 
             this.cVerts = newCVerts;
-        }
 
-        // console.log(this.cVerts);
+        }
 
     };
 
