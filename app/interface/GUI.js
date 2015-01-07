@@ -1,79 +1,33 @@
-define(["domReady!", "dat", "jquery"], function(ready, dat, $){
+define(["domReady!", "dat", "jquery", "ModelGenerator/data/ShapeDescription"], function(ready, dat, $, ShapeData){
 
-	var gui=new dat.GUI();
+	var GUI = function(container){
+		this.gui = new dat.GUI({
+			width: 300,
+			autoPlace : false
+		});
+		container.append(this.gui.domElement);
+		this._makeSliders();
+	};
 
-	if(typeof args === 'undefined'	) args = {};
-	var sliders = 7;
-
-	function initDat(args){
-		
-		if(!args) var args = {};
-
-		var sliders = args.sliders || 7;
-		var values = args.values || {};
-		var folders = args.folders || [];
-
-		gui=0;
-
-		data = values;
-
-		info = {};
-
-		for (var i = 1; i <= sliders; i++) {
-			data["var"+i]=0.0001
-		}
-
-		gui = new dat.GUI();
-		GUI = gui;
-
-			Object.keys(data).forEach(function (key) {
-				gui.add(data, key, -1.0, 1.0).listen().step(0.001);
-			})
-			// gui.remember(data);
-			for (var i in gui.__controllers) {
-				gui.__controllers[i].setValue(0);
+	GUI.prototype._makeSliders = function(){
+		//make a slider for the shape data
+		for (var attr in ShapeData.data){
+			//get the range and name
+			if (ShapeData.Description.hasOwnProperty(attr)){
+				var desc = ShapeData.Description[attr];
+				var val = ShapeData.data[attr];
+				var min = 0;
+				var max = 1;
+				var step = 0.01;
+				if (desc.range === "negativeOne"){
+					min = -1;
+				}
+				ShapeData.data[attr] = 0.01; 
+				var controller = this.gui.add(ShapeData.data, attr, min, max).name(desc.name).listen();
+				controller.setValue(val);
 			}
-			// gui.close();
-		
-			for(var i = 0 ; i < folders.length ; i++){
-
-				var folder = gui.addFolder(folders[i].name);
-
-				thisData=folders[i].values;
-
-				info[folders[i].name] = thisData;
-
-				Object.keys(thisData).forEach(function (key) {
-					folder.add(thisData, key, -1.0, 1.0).listen().step(0.001);
-				})
-				gui.remember(thisData);
-				
-			}
-
-
-		for (var i in gui.__controllers) {
-			gui.__controllers[i].setValue(0);
 		}
+	};
 
-		gui.close();
-	}
-
-	function rebuildGui(args) {
-
-		gui.destroy();
-		initDat(args);
-	}
-
-	initDat(args);
-
-	return {
-		addParameter : function(param, value){
-			data[param] = value;
-			redbuildGui();
-		},
-		bindKey : function(key, callback){
-
-		},
-		rebuildGui: rebuildGui
-	}
+	return GUI;
 });

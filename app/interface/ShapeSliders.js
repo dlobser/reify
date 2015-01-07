@@ -1,6 +1,8 @@
 define(["domReady!", "dat", "jquery"], function(ready, dat, $){
 
-	var gui = new dat.GUI();
+	var gui = new dat.GUI({
+		width: 300
+	});
 
 	gui.open();
 
