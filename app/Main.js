@@ -43,23 +43,22 @@ require(["domReady!", "jquery", "ModelGenerator/shape/Shape",
 	"ModelGenerator/interface/Keyboard", "ModelGenerator/interface/GUI"], 
 function(ready, $, ShapeGenerator, Keyboard, GUI){
 
-	function(ready, $, ShapeGenerator, Keyboard){
-
 		console.log("Reify Shape Generator v6");
 
 		var container = $("#Container");
 
 
-	var gui = new GUI(container);
+		var gui = new GUI(container);
 
-	gui.onchange = function(){
-		generator.phalanx.needsUpdate = true;
-	};
+		gui.onchange = function(){
+			generator.phalanx.needsUpdate = true;
+			generator.phalanx.updateCount = 0;
+		};
 
-	//key bindings
-	Keyboard.bindKey("a", function(){
-		generator.phalanx.pauseAnimation();
-	});
+		//key bindings
+		Keyboard.bindKey("a", function(){
+			generator.phalanx.pauseAnimation();
+		});
 
 
 		var generator = new ShapeGenerator(container, container.width(), container.height());
