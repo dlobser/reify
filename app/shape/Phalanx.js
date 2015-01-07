@@ -23,7 +23,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 		this.layerHeight = phalanxData.layerHeight || 0.27;
 
 		this.shapeData = shapeData;
-		this.coreData = shapeData.cores;
+		this.coreData = shapeData.data;
 
 		this.passData.counter = 0;
 
@@ -67,13 +67,13 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 					}
 				}
 				else{
-					passData.data = shapeData.cores[0];
+					passData.data = shapeData.data;
 				}
 
 				passData.counter = j;
 
 
-				passData.lerpCtrlAmount = Math.floor((shapeData.cores[0].xtraControls*10));
+				passData.lerpCtrlAmount = Math.floor((shapeData.data.xtraControls*10));
 				passData.layers = phalanxData.layers;
 
 				var NG = new CastnGon(passData);
@@ -86,9 +86,9 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 				this.nGons[i+j*this.amount] = NG;
 
-				NG.CTRL2.position.y = (j*j*shapeData.cores[0].lean*0.001);
+				NG.CTRL2.position.y = (j*j*shapeData.data.lean*0.001);
 				NG.CTRL.position.z = j*this.layerHeight;
-				NG.CTRL.rotation.z = j*shapeData.cores[0].baseTwist*0.005;
+				NG.CTRL.rotation.z = j*shapeData.data.baseTwist*0.005;
 
 				NG.init(passData);
 				this.Curve.add(NG.Curve);

@@ -1,257 +1,160 @@
-define(["ModelGenerator/interface/ShapeSliders"], function(GUI){
+define(function(){
+
+	var ShapeData = function(){
+		this.data = {};
+		this._makeData();
+		/*this.gui = new dat.GUI({
+			width: 300,
+			autoPlace : false
+		});*/
+	};
+
+	ShapeData.prototype.set = function(data){
+		for (var attr in data){
+			if (this.data.hasOwnProperty(attr)){
+				this.data[attr] = data[attr];
+			}
+		}
+	};
+
+	ShapeData.prototype.get = function(){
+		var ret = {};
+		for (var attr in this.data){
+			var desc = this.Description[attr];
+			var val = this.data[attr];
+			if (desc.range === ShapeData.Range.NegativeOne){
+				ret[attr] = Math.abs(val);
+				ret[attr+"_sign"] = val > 0;
+			} else {
+				ret[attr] = val;
+			}
+		}
+		return ret;
+	};
+
+	ShapeData.prototype._makeData = function(){
+		for (var param in this.Description){
+			var desc = this.Description[param];
+			this.data[param] = desc.default || 0;
+		}
+	};
 
 	/**
 	 *  enumerable type describing possible ranges
 	 *  of the 
 	 *  @type {Object}
 	 */
-	var Range = {
+	ShapeData.Range = {
 		NegativeOne : "negativeOne",
 		Normal : "normal",
 	};
-
-	//////////////////////////////////
-	/// DATA
-	//////////////////////////////////
-
-	/**
-	 *  The number of cores the DataObject has
-	 *  @type {Number}
-	 *  @const
-	 */
-	var CoreCount = 1;
 
 	/**
 	 *  the attributes that belong to a single core
 	 *  @type {Object}
 	 */
-	var CoreDescription = {
+	ShapeData.prototype.Description = {
 		"linearSpline" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Linear Spline"
 		},
 		"baseTwist" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Base Twist"	
 		},
 		"bpSides" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Side Count",
 		},
 		"bpSize" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Base Size"	
 		},
 		"bpTwist" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Twist"	
 		},
 		"cbTwist" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Cube Twist"	
 		},
-		// "cbWobbleMult" : {
-		// 	"range" : Range.Normal,
-		// 	"name" : "Wobble Mult"	
-		// },
-		// "cbWobbleFreq" : {
-		// 	"range" : Range.Normal,
-		// 	"name" : "Wobble Freq"	
-		// },
 		"tpPetals" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Petal Count"	
 		},
 		"sinTri" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Sine/Triangle"
 		},
 		"tpMult" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Turtle Mult"
 		},
 		"tpLoop" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Turtle Loop"
 		},
 		"tpTwist" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Turtle Weave"
 		},
 		"tpTwist2" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Turtle Twist 2"
 		},
 		"tpCornerMult" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Corner Mult"
 		},
 		"xtraControls" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv Controls"
 		},
 		"xtraWaveMult" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "subDiv Multiply"
 		},
 		"xtraZWaveFreq" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv ZFrequency"
 		},
 		"xtraXWaveFreq" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv XFrequency"
 		},
 		"xtraBulgeAmount" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv Bulge Amount"
 		},
 		"xtraBulgeFreq" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv Bulge Freq"
 		},
 		"xtraSinTri" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "subDiv WaveType"
 		},
 		"bulgeAmount" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Bulge Amount"
 		},
 		"bulgeFreq" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Bulge Frequency"
 		},
 		"bulgeOff" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Bulge Offset"
 		},
 		"bulgeSinTri" : {
-			"range" : Range.Normal,
+			"range" : ShapeData.Range.Normal,
 			"name" : "Bulge Wave Type"
 		},
 		"lean" : {
-			"range" : Range.NegativeOne,
+			"range" : ShapeData.Range.NegativeOne,
 			"name" : "Lean"
 		},
 	};
-
-	/**
-	 *  the attributes that belong to a base
-	 *  @type {Object}
-	 */
-	var BaseDescription = {
-		// "twist" : {
-		// 	"range" : Range.NegativeOne,
-		// 	"name" : "Twist"	
-		// },
-		// "offset" : {
-		// 	"range" : Range.NegativeOne,
-		// 	"name" : "Offset"
-		// },
-	};
-
-	//////////////////////////////////
-	/// GUI CREATION
-	//////////////////////////////////
-
-	function addBaseData(obj){
-		var base = obj.base = {};
-		var folder = GUI.addFolder("Base");
-		folder.open();
-		for (var param in BaseDescription){
-			var desc = BaseDescription[param];
-			GUI.addSlider(folder, base, param, desc);
-		}
-	}
-
-	function addCoreData(obj, coreCount){
-		var cores = obj.cores = [];
-		var top = GUI.addFolder("Cores");
-		top.open();
-		for (var i = 0; i < coreCount; i++){
-			var core = {};
-			var folder = GUI.addFolder(i, top);
-			folder.open();
-			for (var param in CoreDescription){
-				core[param] = 0.0;
-				var desc = CoreDescription[param];
-				GUI.addSlider(folder, core, param, desc);
-			}
-			cores.push(core);
-		}
-	}
-
-	function createDataObject(){
-		var DataObj = {};
-		addBaseData(DataObj);
-		addCoreData(DataObj, CoreCount);
-		return DataObj;
-	}
-
-	var DataObj = createDataObject();
-
-	//////////////////////////////////
-	/// GET THE OBJECT
-	//////////////////////////////////
-
-	function getObject(){
-		var ret = {};
-		ret.base = {};
-		ret.cores = [];
-		getBase(ret.base);
-		getCores(ret.cores);		
-		return ret;
-	}
-
-	function getCores(retObj){
-		var cores = DataObj.cores;
-		for (var i = 0; i < cores.length; i++){
-			var core = cores[i];
-			var coreObj = retObj[i] = {};
-			for (var param in core){
-				var val = core[param];
-				var desc = CoreDescription[param];
-				if (desc.range === Range.NegativeOne){
-					coreObj[param] = Math.abs(val);
-					coreObj[param+"_sign"] = val > 0;
-				} else {
-					coreObj[param] = val;
-				}
-			}
-		}
-	}
-
-	function getBase(retObj){
-		var base = DataObj.base;
-		for (var param in base){
-			var val = base[param];
-			var desc = BaseDescription[param];
-			if (desc.range === Range.NegativeOne){
-				retObj[param] = Math.abs(val);
-				retObj[param+"_sign"] = val > 0;
-			} else {
-				retObj[param] = val;
-			}
-		}
-	}
-
-	function setData(data, parent){
-		if (!parent){
-			parent = DataObj;
-		}
-		for (var attr in data){
-			if (parent.hasOwnProperty(attr)){
-				if (typeof data[attr] === "object"){
-					setData(data[attr], parent[attr]);
-				} else {
-					parent[attr] = data[attr];
-				}
-			}
-		}
-	}
-
-	DataObj.set = setData;
 	
-	return DataObj;
+	return new ShapeData();
 });

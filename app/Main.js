@@ -38,7 +38,10 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard"],
+
+require(["domReady!", "jquery", "ModelGenerator/shape/Shape", 
+	"ModelGenerator/interface/Keyboard", "ModelGenerator/interface/GUI"], 
+function(ready, $, ShapeGenerator, Keyboard, GUI){
 
 	function(ready, $, ShapeGenerator, Keyboard){
 
@@ -46,11 +49,18 @@ require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/in
 
 		var container = $("#Container");
 
-		console.log();
 
-		console.log();
+	var gui = new GUI(container);
 
-		
+	gui.onchange = function(){
+		generator.phalanx.needsUpdate = true;
+	};
+
+	//key bindings
+	Keyboard.bindKey("a", function(){
+		generator.phalanx.pauseAnimation();
+	});
+
 
 		var generator = new ShapeGenerator(container, container.width(), container.height());
 
