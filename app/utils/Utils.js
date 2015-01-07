@@ -148,6 +148,54 @@ define(["THREE"],function(THREE){
 
 		linearCurve:linearCurve,
 
+		checkLength : function(arr,scalar,height) {
+
+			var layerHeight = height || 0.27;
+
+			var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F1200 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
+
+			var E = 0.0;
+			var D = 0.0;
+
+			for(var i = 0 ; i < arr.length ; i++){
+
+				for(j = 0 ; j < arr[i].length ; j++){
+
+					var vec = arr[i][j];
+
+					var eValue = 0;
+
+					if(j>0){
+
+						var dist = arr[i][j-1].distanceTo(arr[i][j]);
+						D+=dist;
+						eValue = .4 * dist * layerHeight;
+
+					}
+
+					E+=eValue;
+
+					var X = arr[i][j].x + 110;
+					var Y = arr[i][j].y + 110;
+					var Z = arr[i][j].z + layerHeight;
+
+					output+="G1 X" + X;
+					output+=" Y"  +  Y;
+					output+=" Z"  +  Z;
+					output+=" E"  + E;
+					output+='\n';
+					
+				}	
+				  
+			}
+			
+			console.log("total volume is: " + E + " cubic millimeters");
+			console.log("total length is: " + D + " millimeters");
+
+		},
+			   
+		
+
 		lerp:function(a,b,t){
 			return a + ((b-a)*t);
 		},

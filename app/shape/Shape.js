@@ -1,7 +1,7 @@
 define(["THREE", "ModelGenerator/utils/File", "OrbitControls", 
 	"ModelGenerator/utils/PerlinNoise", "ModelGenerator/shape/Phalanx", "ModelGenerator/shape/nGon", 
-	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils"], 
-function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils){
+	"ModelGenerator/data/Songs", "ModelGenerator/utils/Utils", "ModelGenerator/utils/SaveImg"], 
+function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, SaveImg){
 
 	/**
 	 *  setup the three.js environment
@@ -9,10 +9,12 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils){
 	
 	var ShapeGenerator = function(container, width, height){
 
+		console.log(FileUtils);
+
 		this.camera = new THREE.PerspectiveCamera( 60, width / height, 1, 20000 );
 		this.scene = new THREE.Scene();
 		this.renderer = new THREE.WebGLRenderer({alpha : true});
-		this.renderer.setClearColor( 0x112233, 1);
+		this.renderer.setClearColor( 0x000000, 0);
 		this.renderer.setSize(width, height);
 
 		container.append(this.renderer.domElement);
@@ -49,12 +51,18 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils){
 		if(this.phalanx.needsUpdate){
 			this.object = this.phalanx.draw();
 		}
+
+	};
+
+	ShapeGenerator.prototype.saveImg = function(name) {
+		SaveImg.saveImg(this.renderer,'pic');
 	};
 
 	/**
 	 *  any teardown that needs to happen to remove
 	 *  this object and any objects which it created from memory. 
 	 */
+	
 	ShapeGenerator.prototype.dispose = function(){
 		this.animate = function(){};
 		this.scene.remove(this.object);

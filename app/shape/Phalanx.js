@@ -139,17 +139,29 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 	};
 
-	Phalanx.prototype.exportGCode = function(){
+	Phalanx.prototype.exportGCode = function(t){
 		
 		var self = this;
 
+		var type = t || "none";
+
 		this.onFinished(function(){
+
 			var verts = [];
 			var children = self.Curve.children;
 			for(var i = 0 ; i < children.length ; i++){
 				verts = verts.concat(children[i].geometry.vertices);
 			}
-			FileUtils.saveGCodeMakerbot([verts], 1);
+
+			Utils.checkLength([verts]);
+
+			if(type == "makerBot"){
+				FileUtils.saveGCodeMakerbot([verts], 1);
+			}
+			else if(type == "ultiMaker"){
+				FileUtils.saveGCodeUltimaker([verts], 1);
+			}
+
 		});
 
 		this._currentLayer = 0;

@@ -38,29 +38,50 @@ require.config({
 	}
 });
 
-require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard"], 
-function(ready, $, ShapeGenerator, Keyboard){
+require(["domReady!", "jquery", "ModelGenerator/shape/Shape", "ModelGenerator/interface/Keyboard"],
 
-	console.log("Reify Shape Generator v6");
+	function(ready, $, ShapeGenerator, Keyboard){
 
-	var container = $("#Container");
+		console.log("Reify Shape Generator v6");
 
-	var generator = new ShapeGenerator(container, container.width(), container.height());
+		var container = $("#Container");
 
-	//key bindings
-	Keyboard.bindKey("a", function(){
-		generator.phalanx.pauseAnimation();
-	});
+		console.log();
 
-	Keyboard.bindKey("4", function(){
-		generator.phalanx.exportGCode();
-	});
+		console.log();
 
-	Keyboard.bindKey("s", function(){
-		generator.phalanx.saveData();
-	});
-	Keyboard.bindKey("r", function(){
-		generator.phalanx.setData(data);
-	});
-	
-});
+		
+
+		var generator = new ShapeGenerator(container, container.width(), container.height());
+
+		//key bindings
+		Keyboard.bindKey("a", function(){
+			generator.phalanx.pauseAnimation();
+		});
+
+		Keyboard.bindKey("4", function(){
+			generator.phalanx.exportGCode("makerBot");
+		});
+
+		Keyboard.bindKey("5", function(){
+			generator.phalanx.exportGCode("ultiMaker");
+		});
+
+		Keyboard.bindKey("6", function(){
+			generator.phalanx.exportGCode();
+		});
+
+		Keyboard.bindKey("s", function(){
+			generator.phalanx.saveData();
+		});
+
+		Keyboard.bindKey("r", function(){
+			generator.phalanx.setData(data);
+		});
+
+		Keyboard.bindKey("i", function(){
+			generator.saveImg();
+		});
+		
+	}
+);
