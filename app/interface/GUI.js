@@ -25,9 +25,16 @@ define(["domReady!", "dat", "jquery", "ModelGenerator/data/ShapeDescription"], f
 				ShapeData.data[attr] = 0.01; 
 				var controller = this.gui.add(ShapeData.data, attr, min, max).name(desc.name).listen();
 				controller.setValue(val);
+				controller.onChange(this._onchange.bind(this));
 			}
 		}
 	};
+
+	GUI.prototype._onchange = function(){
+		this.onchange();
+	};
+
+	GUI.prototype.onchange = function(){};
 
 	return GUI;
 });

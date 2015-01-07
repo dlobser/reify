@@ -46,10 +46,13 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 
 	var container = $("#Container");
 
-
 	var generator = new ShapeGenerator(container, container.width(), container.height());
 
 	var gui = new GUI(container);
+
+	gui.onchange = function(){
+		generator.phalanx.needsUpdate = true;
+	};
 
 	//key bindings
 	Keyboard.bindKey("a", function(){
