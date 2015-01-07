@@ -16,7 +16,6 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 		this.pause = false;
 		this.needsUpdate = true;
-		this.updateCount = 0;
 
 		this.amount = phalanxData.amount || 1;
 		this.layers = phalanxData.layers || 1;
@@ -107,13 +106,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 			this.args.counter = 0;
 			this.drawFinished = true;
 			this.callDrawFinished();
-			if(this.updateCount<1){
-				this.updateCount++;
-			}
-			else{
-				this.updateCount=0;
-				this.needsUpdate = false;
-			}
+			this.needsUpdate = false;
 		} else {
 			this.drawFinished = false;
 		}

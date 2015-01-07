@@ -54,6 +54,11 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 	};
 
+	ShapeGenerator.prototype.needsUpdate = function(){
+		this.phalanx.needsUpdate = true;
+		this.phalanx._currentLayer = 0;
+	};
+
 	ShapeGenerator.prototype.saveImg = function(name) {
 		SaveImg.saveImg(this.renderer,'pic');
 	};

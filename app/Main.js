@@ -51,8 +51,7 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 		var gui = new GUI(container);
 
 		gui.onchange = function(){
-			generator.phalanx.needsUpdate = true;
-			generator.phalanx.updateCount = 0;
+			generator.needsUpdate();
 		};
 
 		//key bindings
