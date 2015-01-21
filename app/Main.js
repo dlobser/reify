@@ -59,12 +59,20 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 			generator.phalanx.pauseAnimation();
 		});
 
-
 		var generator = new ShapeGenerator(container, container.width(), container.height());
 
 		//key bindings
 		Keyboard.bindKey("a", function(){
 			generator.phalanx.pauseAnimation();
+		});
+
+		Keyboard.bindKey("c", function(){
+			generator.useAnimCam = !generator.useAnimCam ;
+		});
+
+		Keyboard.bindKey("p", function(){
+			generator.captureFrames = true;
+			generator.counter = 0;
 		});
 
 		Keyboard.bindKey("4", function(){
@@ -84,7 +92,12 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 		});
 
 		Keyboard.bindKey("r", function(){
+			console.log(data);
 			generator.phalanx.setData(data);
+		});
+
+		Keyboard.bindKey("m", function(){
+			generator.showRuler();
 		});
 
 		Keyboard.bindKey("i", function(){

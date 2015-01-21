@@ -1,7 +1,8 @@
 define({
 	amount:2,
-	layers:200,
-	polySize:30,
+	layers:370,
+	polySize:50,
 	layerHeight : 0.27,
-	detail : 500,
+	detail : 300,
 });
+

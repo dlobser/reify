@@ -37,9 +37,12 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 		this.mat = new THREE.LineBasicMaterial();
 		this.Curve = new THREE.Line(this.geo,this.mat);
 
-		this.updateFrequency = 5;
+		// this.updateFrequency = 5;
 		this._currentLayer = 0;
-		this._layerStep = 5;
+		this._layerStep = 18;
+		this._fillStep = 0;
+		this._layerFill = 0;
+		this._layerSkip = 3;
 		this.drawFinished = false;
 
 	};
@@ -48,7 +51,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 		var j = this._currentLayer;
 
-		while(j < this._currentLayer + this._layerStep){
+		while(j < phalanxData.layers){
 
 			this.passData.counter++;
 
@@ -75,6 +78,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 				passData.lerpCtrlAmount = Math.floor((shapeData.data.xtraControls*10));
 				passData.layers = phalanxData.layers;
+				passData.detail = phalanxData.detail;
 
 				var NG = new CastnGon(passData);
 
@@ -86,27 +90,38 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 				this.nGons[i+j*this.amount] = NG;
 
-				NG.CTRL2.position.y = (j*j*shapeData.data.lean*0.001);
+				NG.CTRL2.position.y = (j*j*(shapeData.data.lean/this.layers)*.1);
 				NG.CTRL.position.z = j*this.layerHeight;
-				NG.CTRL.rotation.z = j*shapeData.data.baseTwist*0.005;
+				var twister = shapeData.data.baseTwist - Math.abs(shapeData.data.bpTwist/2);
+				NG.CTRL.rotation.z = j*twister*0.005;
 
 				NG.init(passData);
 				this.Curve.add(NG.Curve);
 				theseCurves.push(NG.Curve);
 				
 			}
-
-			j++;
+			this._layerFill++;
+			j+=this._layerStep;
 		}
 
-		this._currentLayer += this._layerStep;
 
-		if(this._currentLayer+this._layerStep > phalanxData.layers){
-			this._currentLayer = 0;
-			this.args.counter = 0;
-			this.drawFinished = true;
-			this.callDrawFinished();
-			this.needsUpdate = false;
+		// this._currentLayer += this._layerStep;
+
+		if(this._layerFill >= phalanxData.layers/this._layerStep){
+			if(this._fillStep>=this._layerStep){
+				this._currentLayer = 0;
+				this._layerFill = 0;
+				this._fillStep=0;
+				this.args.counter = 0;
+				this.drawFinished = true;
+				this.callDrawFinished();
+				this.needsUpdate = false;
+			}
+			else
+			{
+				this._fillStep+=this._layerSkip;
+				this._currentLayer=this._fillStep;
+			}
 		} else {
 			this.drawFinished = false;
 		}
@@ -135,8 +150,8 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 	Phalanx.prototype.dispose = function(){
 
-		this.nGons.forEach(function(o){obj.dispose();});
-		this.nGons = null;
+		this.nGons.forEach(function(o){o.dispose();});
+		this.nGons = [];
 
 	};
 
@@ -145,6 +160,10 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 		var self = this;
 
 		var type = t || "none";
+
+		this._layerSkip = 1;
+
+		var that = this;
 
 		this.onFinished(function(){
 
@@ -163,7 +182,14 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 				FileUtils.saveGCodeUltimaker([verts], 1);
 			}
 
+			that._layerSkip = 3;
+			that.dispose();
+			that._layerFill=0;that._fillStep=0;that._currentLayer=0;that.drawFinished=false;console.log(that)
+			while(that._currentLayer<that._layerStep)
+				that.draw();
 		});
+		// this.onFinished(function(){that.dispose();});
+		// this.onFinished(function(){that.pause=false;that.needsUpdate=true;that._fillStep=0;that._currentLayer=0;that.drawFinished=false;console.log(that)});
 
 		this._currentLayer = 0;
 		this.pause = true;
@@ -172,12 +198,12 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 	};
 
 	Phalanx.prototype.saveData = function(){
-
-		console.log(JSON.stringify(shapeData));
+		console.log(JSON.stringify(shapeData.data));
 	};
 
 	Phalanx.prototype.setData = function(data){
 		this.shapeData.set(data);
+		this.needsUpdate = true;
 	};
 
 	/**

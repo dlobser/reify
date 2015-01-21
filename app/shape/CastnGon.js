@@ -9,7 +9,7 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
         this.closed = true;
         this.args.data = args.data || {var1:0,var2:0,var3:0,var4:0,var5:0,var6:0,var7:0};
         this.sides = Math.max(3,3 + (Math.floor(this.args.data.bpSides*10)));
-        this.detail = args.detail || 1000;
+        this.detail = args.detail || 10;
         this.polySize = args.polySize || 1;
 
         this.lerpCtrlAmount = args.lerpCtrlAmount || 0;
@@ -79,7 +79,8 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
                     Math.cos(c+Math.PI+(i/this.sides*Math.PI*2))*1,
                     0);
 
-            var off = ( ( this.counter / this.args.layers ) ) * ( aData.bulgeFreq  );
+            var frac = ( ( this.counter / this.args.layers ) );
+            var off = frac * ( aData.bulgeFreq  );
             off -= (aData.bulgeOff * (aData.bulgeFreq ) );
             off += 0.5;
 
@@ -93,10 +94,19 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
             var bulge = (1+Utils.comboCos(off,aData.bulgeSinTri))/2;
             bulge*=-1;
             bulge+=1;
+            var sFrac = ((frac*-1)+1)*.5;
+            var ba = aData.bulgeAmount;
+            if(aData.bulgeAmount<0)
+                ba=aData.bulgeAmount+sFrac;
+            var sc = (.75+(this.args.data.bpSize)*0.5)*(1+((bulge)*ba));//(1+(this.args.data.bpSize)*0.5)+bulge*aData.bulgeAmount;
+            // if(sc< sFrac ){
+            //     sc = sFrac;
+            // }
+            this.bulgeAmount = sc;
+            
 
-            var sc = (1+(this.args.data.bpSize)*0.5)+bulge*aData.bulgeAmount*0.5;
 
-            this.castObject.scale = new THREE.Vector3(sc,sc,sc);
+            // this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
             this.castObject.rotation.x=1*this.counter*0.005*((this.args.data.cbTwist));
             this.castObject.rotation.y=1*this.counter*0.005*((this.args.data.cbTwist));
@@ -116,6 +126,8 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
                     r = pPos[0].point;
                 }
             }
+
+            r.multiplyScalar(sc);
 
             this.cVerts.push(r);
         }
@@ -149,10 +161,10 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
 
                         //move the points around
 
-                        var offset = Utils.comboWave(((i*aData.xtraXWaveFreq*Math.PI*2)+this.counter*aData.xtraZWaveFreq*0.05),aData.xtraSinTri*0.3331);
-                        var offset2 = Utils.comboWave(0.05*this.counter*aData.xtraBulgeFreq,aData.xtraSinTri*0.3331);
-
-                        pVert.multiplyScalar(1+(aData.xtraWaveMult*0.25)*offset+(offset2*aData.xtraBulgeAmount*0.25));
+                        var offset = Utils.bakedWave(((i*aData.xtraXWaveFreq*Math.PI*2)+this.counter*aData.xtraZWaveFreq*0.05),aData.xtraSinTri*0.3331);
+                        var offset2 = Utils.bakedWave(0.05*this.counter*aData.xtraBulgeFreq,aData.xtraSinTri*0.3331);
+                        var mult = 1+(aData.xtraWaveMult*0.25)*offset+(offset2*aData.xtraBulgeAmount*0.25);
+                        pVert.multiplyScalar(mult);
 
                         this.lerpCVerts.push(pVert);
                         newCVerts.push(pVert);

@@ -27,7 +27,7 @@ function(THREE, noise, Utils){
         this.CTRL2.add(this.Curve);
 
         this.geo = new THREE.Geometry();
-        this.mat = args.material || new THREE.LineBasicMaterial( {color:0xffffff,transparent:true,opacity:1,linewidth:2,vertexColors:THREE.VertexColors});
+        this.mat = args.material || new THREE.LineBasicMaterial( {color:0xffffff,transparent:false,opacity:1,linewidth:15,vertexColors:THREE.VertexColors});
         this.Curve = new THREE.Line(this.geo,this.mat);
 
         this.counter = args.counter || 0;
@@ -72,6 +72,8 @@ function(THREE, noise, Utils){
         var aData = this.args.data;
 
         var verts = [];
+        var colors = [];
+
 
         for(var i = 0 ; i < this.detail ; i++){
 
@@ -107,7 +109,7 @@ function(THREE, noise, Utils){
             var cornerMult = aData.tpCornerMult;
             var cornerCos = (1+Math.cos(Math.PI+pos.dPos*Math.PI*2))/2;
 
-            var vecc = Utils.comboWave(
+            var vecc = Utils.bakedWave(
                         (twist2*0.5+twist*3)+
                         pos.cPos*Math.PI*2*
                         (petals),aData.sinTri)*
@@ -137,6 +139,37 @@ function(THREE, noise, Utils){
             vec.setFromMatrixPosition(kid.matrixWorld);
             vec.t = pos.cPos;
 
+            //colors
+
+            var col = (Math.PI+vecc)/(Math.PI*4); //turtle mult
+            var colVec = Utils.vec(col);
+            var col2 = Math.abs((kid.position.z)/(Math.PI*2));
+            var c = noise(vec.x*0.1,vec.y*0.1,vec.z*0.1)/5;
+            var c2 = 0.7+noise(vec.x*0.12,vec.y*0.12,vec.z*0.12)/5;
+            var c3 = (.5+Math.sin(vec.distanceTo(new THREE.Vector3(0,0,vec.z))*.5))/6;
+            var ribs = (.25+(1+Math.sin(this.counter))/16);
+            var ribVec = Utils.vec(ribs);
+            ribs+=col;
+            ribs+=c;
+            var bulgeColor = (this.bulgeAmount-.75)/1.5;
+            var bulgeVec = Utils.vec(bulgeColor).multiply(Utils.vec(.6,.8,1));
+            ribs+=bulgeColor*.5;
+            var colorVec = Utils.vec();
+            colorVec.add(ribVec);
+            colorVec.add(colVec);
+            colorVec.add(bulgeVec);
+            if(verts.length>4){
+                var a = Utils.findAngle(verts[i-4],verts[i-2],verts[i-3]);
+                a*=.314;
+                var angle = Math.max(aData.tpMult,a);
+                // colorVec.multiply(Utils.vec(angle*.314));
+                colors[i-3].r*=angle;colors[i-3].g*=angle;colors[i-3].b*=angle;
+
+            }
+            colors.push(new THREE.Color(colorVec.x,colorVec.y,colorVec.z));
+
+            //end colors
+
             if(i===0){
                 verts["id"+pos.cPos] = i;
             }
@@ -152,8 +185,10 @@ function(THREE, noise, Utils){
         }
 
         this.geo.vertices = verts;
+        this.geo.colors = colors;
 
         this.CTRL.remove(base);
+
     };
 
     Poly.prototype._makeLinearCurve = function(){
@@ -173,12 +208,12 @@ function(THREE, noise, Utils){
         if(this.closed && this.geo.vertices.length>0)
             this.geo.vertices.push(this.geo.vertices[0].clone());
 
-        for(var i = 0 ; i < this.geo.vertices.length ; i++){
-            var c2 = new THREE.Color((2+Math.sin(i*0.1))/5,(2+Math.cos(2+i*0.1))/5,(2+Math.sin(1+i*0.1))/5);
-            var v = this.geo.vertices[i];
-            var c = 0.3+noise(v.x*0.3,v.y*0.3,v.z*0.3)/2;
-            this.geo.colors[i] = new THREE.Color(c+c2.r,c+c2.g,c+c2.b);
-        }
+        // for(var i = 0 ; i < this.geo.vertices.length ; i++){
+        //     var c2 = new THREE.Color((2+Math.sin(i*0.1))/5,(2+Math.cos(2+i*0.1))/5,(2+Math.sin(1+i*0.1))/5);
+        //     var v = this.geo.vertices[i];
+        //     var c = 0.3+noise(v.x*0.3,v.y*0.3,v.z*0.3)/2;
+        //     this.geo.colors[i] = new THREE.Color(c+c2.r,c+c2.g,c+c2.b);
+        // }
 
         this.Curve.geometry = this.geo;
         this.Curve.geometry.colors = this.geo.colors;
