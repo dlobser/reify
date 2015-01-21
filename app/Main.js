@@ -103,6 +103,10 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 		Keyboard.bindKey("i", function(){
 			generator.saveImg();
 		});
+
+		Keyboard.bindKey("h", function(){
+			gui.hide();
+		});
 		
 	}
 );

@@ -36,5 +36,9 @@ define(["domReady!", "dat", "jquery", "ModelGenerator/data/ShapeDescription"], f
 
 	GUI.prototype.onchange = function(){};
 
+	GUI.prototype.hide = function(){
+		// this.gui.hide();
+	};
+
 	return GUI;
 });
