@@ -151,7 +151,7 @@ function(THREE, noise, Utils){
             var ribVec = Utils.vec(ribs);
             ribs+=col;
             ribs+=c;
-            var bulgeColor = (this.bulgeAmount-.75)/1.5;
+            var bulgeColor = (this.bulgeAmount-.75)/2;
             var bulgeVec = Utils.vec(bulgeColor).multiply(Utils.vec(.6,.8,1));
             ribs+=bulgeColor*.5;
             var colorVec = Utils.vec();

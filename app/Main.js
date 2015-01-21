@@ -68,12 +68,13 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 
 		Keyboard.bindKey("c", function(){
 			generator.useAnimCam = !generator.useAnimCam ;
+			generator.captureFrames = true;
 		});
 
-		Keyboard.bindKey("p", function(){
-			generator.captureFrames = true;
-			generator.counter = 0;
-		});
+		// Keyboard.bindKey("p", function(){
+		// 	generator.captureFrames = true;
+		// 	generator.counter = 0;
+		// });
 
 		Keyboard.bindKey("4", function(){
 			generator.phalanx.exportGCode("makerBot");

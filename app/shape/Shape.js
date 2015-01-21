@@ -24,6 +24,8 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		// console.log("[["+tri+"],["+square+"],["+saw+"]]"+"");
 
+		this.width=width;
+		this.height=height;
 
 		this.camera = new THREE.PerspectiveCamera( 60, width / height, 1, 20000 );
 
@@ -67,14 +69,16 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		this.captureFrames = false;
 
 		this.ctx = this.renderer.domElement;
-		this.gif = new GIF({workers:1,quality:2});
+		this.gif = new GIF({workers:4,quality:10});
 		this.gif.on('finished', function(blob) {
 			window.open(URL.createObjectURL(blob));
+			this.renderer.setSize(this.width, this.height);
+
 		});
 
 
 		this.gif.on('progress',function(){
-			console.log(++this.counter);
+			
 		}.bind(this));
 
 		this.animate();
@@ -88,41 +92,30 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		requestAnimationFrame(this.animate.bind(this));
 		this.controls.update(10);
-		// this.counter++;
-
-		// if(!this.phalanx.needsUpdate)
 		
-		if(this.useAnimCam){
+		if(this.useAnimCam && this.captureFrames){
 
+			this.c++;
+			
+			this.animCamera.position.x = Math.sin(this.c/5)*160;
+			this.animCamera.position.z = Math.cos(this.c/5)*160;
+			this.animCamera.lookAt(new THREE.Vector3 (0.0, 15.0, 0.0));
+			this.renderer.setSize(400, 400);
 			this.renderer.render( this.scene, this.animCamera );
-			this.animCamera.position.x = Math.sin(this.counter/5)*160;
-			this.animCamera.position.z = Math.cos(this.counter/5)*160;
-			this.animCamera.lookAt(new THREE.Vector3 (0.0, 25.0, 0.0));
 
-			if(this.captureFrames){
-				this.counter=0;
-
-				// this.renderer.setSize(400, 400);
-				this.counter = 0;
-			   	// setTimeout(function(){
-					for(var i = 0 ; i < 32 ; i++){
-						this.gif.addFrame(this.ctx, {delay: 5});
-						// this.animCamera.position.x = Math.sin(i/5)*200;
-						// this.animCamera.position.z = Math.cos(i/5)*200;
-						// this.animCamera.lookAt(new THREE.Vector3 (0.0, 25.0, 0.0));
-					}
-				// if(this.counter/5>Math.PI*2){
-					this.gif.render();
-				// }
-				// }.bind(this),1000); 
-
+			if(this.c<32){
+				console.log(this.c);
+				this.gif.addFrame(this.ctx, {transparent:true, copy:true, delay: 5});
+			}
+			else{
+				console.log('done');
+				this.c=0;
+				this.gif.render();
 				this.captureFrames = false;
+				this.useAnimCam = false;
+				this.renderer.setSize(this.width, this.height);
 
-				// 	this.renderer.setSize(this.size.width, this.size.height);
 
-
-				// if(this.counter/10>Math.PI*2)
-				// 	this.captureFrames = false;
 			}
 		}
 		else
@@ -137,10 +130,12 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 	ShapeGenerator.prototype.showRuler = function(){
 
 		if(this.ruler.visible){
+
 			this.scene.remove(this.ruler);
 			this.ruler.visible = false;
 		}
 		else{
+
 			this.scene.add(this.ruler);
 			this.ruler.visible = true;
 		}

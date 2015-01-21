@@ -157,18 +157,37 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 	Phalanx.prototype.exportGCode = function(t){
 		
-		var self = this;
+		// var self = this;
 
 		var type = t || "none";
 
 		this._layerSkip = 1;
+		this._layerStep = phalanxData.layers;
 
 		var that = this;
+
+		// for(var i = 0 ; i < that.Curve.children.length ; i++){
+		// 	console.log(that.Curve.children[i].geometry.vertices[0].z);
+		// }
+
+		// console.log('break');
+
+		// this.onFinished(function(){
+		// 	that.Curve.children.sort(function(a,b){
+		// 		a.geometry.vertices[0].z-b.geometry.vertices[0].z;
+		// 	});
+
+		// 	for(var i = 0 ; i < that.Curve.children.length ; i++){
+		// 		console.log(that.Curve.children[i].geometry.vertices[0].z);
+		// 	}		
+		// });
 
 		this.onFinished(function(){
 
 			var verts = [];
-			var children = self.Curve.children;
+			
+			var children = that.Curve.children;
+
 			for(var i = 0 ; i < children.length ; i++){
 				verts = verts.concat(children[i].geometry.vertices);
 			}
@@ -183,6 +202,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 			}
 
 			that._layerSkip = 3;
+			that._layerStep = 18;
 			that.dispose();
 			that._layerFill=0;that._fillStep=0;that._currentLayer=0;that.drawFinished=false;console.log(that)
 			while(that._currentLayer<that._layerStep)

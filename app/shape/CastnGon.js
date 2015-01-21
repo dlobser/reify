@@ -95,17 +95,20 @@ define(["THREE", "ModelGenerator/utils/PerlinNoise", "ModelGenerator/utils/Utils
             bulge*=-1;
             bulge+=1;
             var sFrac = ((frac*-1)+1)*.5;
+
             var ba = aData.bulgeAmount;
+
             if(aData.bulgeAmount<0)
                 ba=aData.bulgeAmount+sFrac;
-            var sc = (.75+(this.args.data.bpSize)*0.5)*(1+((bulge)*ba));//(1+(this.args.data.bpSize)*0.5)+bulge*aData.bulgeAmount;
-            // if(sc< sFrac ){
-            //     sc = sFrac;
-            // }
+            else if(aData.bulgeAmount>0)
+                ba=aData.bulgeAmount*.7;
+
+            var size = (.75+(this.args.data.bpSize)*0.5);
+
+            var sc = size*(1+((bulge)*ba));//(1+(this.args.data.bpSize)*0.5)+bulge*aData.bulgeAmount;
+           
             this.bulgeAmount = sc;
             
-
-
             // this.castObject.scale = new THREE.Vector3(sc,sc,sc);
 
             this.castObject.rotation.x=1*this.counter*0.005*((this.args.data.cbTwist));
