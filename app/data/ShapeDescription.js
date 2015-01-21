@@ -24,12 +24,30 @@ define(function(){
 			var val = this.data[attr];
 			if (desc.range === ShapeData.Range.NegativeOne){
 				ret[attr] = Math.abs(val);
-				ret[attr+"_sign"] = val > 0;
+				ret[attr+"_sign"] = val >= 0;
 			} else {
 				ret[attr] = val;
 			}
 		}
 		return ret;
+	};
+
+	String.prototype.endsWith = function(suffix) {
+	    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+
+	ShapeData.prototype.setFromPrediction = function(prediction){
+		var ret = {};
+		for (var attr in prediction){
+			var val = prediction[attr];
+			if (prediction.hasOwnProperty(attr + "_sign")){
+				var sign = prediction[attr+"_sign"] > 0.5 ? 1 : -1;
+				ret[attr] = sign * val;
+			} else if (!attr.endsWith("_sign")){
+				ret[attr] = val;
+			}
+		}
+		this.set(ret);
 	};
 
 	ShapeData.prototype._makeData = function(){
