@@ -218,7 +218,9 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 	};
 
 	Phalanx.prototype.saveData = function(){
-		console.log(JSON.stringify(shapeData.data));
+		var r = JSON.stringify(shapeData.data);
+		console.log(r);
+		return r;
 	};
 
 	Phalanx.prototype.setData = function(data){

@@ -59,7 +59,7 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 			generator.phalanx.pauseAnimation();
 		});
 
-		var generator = new ShapeGenerator(container, container.width(), container.height());
+			generator = new ShapeGenerator(container, container.width(), container.height());
 
 		//key bindings
 		Keyboard.bindKey("a", function(){
@@ -108,6 +108,18 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 		Keyboard.bindKey("h", function(){
 			gui.hide();
 		});
+
+		//for gif output
+		Keyboard.bindKey("7", function(){
+			
+			if(typeof data=='undefined')
+				data = {"linearSpline":0,"baseTwist":0,"bpSides":0,"bpSize":0,"bpTwist":0,"cbTwist":0,"tpPetals":0,"sinTri":0,"tpMult":0,"tpLoop":0,"tpTwist":0,"tpTwist2":0,"tpCornerMult":0,"xtraControls":0,"xtraWaveMult":0,"xtraZWaveFreq":0,"xtraXWaveFreq":0,"xtraBulgeAmount":0,"xtraBulgeFreq":0,"xtraSinTri":0,"bulgeAmount":0,"bulgeFreq":0,"bulgeOff":0,"bulgeSinTri":0,"lean":0}
+			
+			generator.makeGif(data, function(gifUrl){
+				var img = $("<img>").attr("src", gifUrl).appendTo($("#images"));
+			});
+		});
+		
 		
 	}
 );
