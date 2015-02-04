@@ -108,9 +108,14 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 		Keyboard.bindKey("h", function(){
 			gui.hide();
 		});
-
-		Keyboard.bindKey("8", function(){
+		Keyboard.bindKey("0", function(){
 			generator.extrudeGeo();
+		});
+		Keyboard.bindKey("8", function(){
+			generator.extrudeTubeGeo();
+		});
+		Keyboard.bindKey("9", function(){
+			generator.unExtrudeGeo();
 		});
 
 
