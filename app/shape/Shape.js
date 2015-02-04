@@ -26,6 +26,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		this.width=width;
 		this.height=height;
+		// this.needsUpdate = true;
 
 		this.camera = new THREE.PerspectiveCamera( 60, width / height, 1, 20000 );
 
@@ -90,6 +91,8 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 	 */
 	ShapeGenerator.prototype.animate = function(){
 
+		this.light.position.copy( this.camera.position );
+
 		requestAnimationFrame(this.animate.bind(this));
 		this.controls.update(10);
 		
@@ -102,7 +105,49 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		if(this.phalanx.needsUpdate){
 			this.object = this.phalanx.draw();
+			// this.needsUpdate = true;
 		}
+		// else
+		// 	this.needsUpdate = false;
+
+	};
+
+	ShapeGenerator.prototype.extrudeGeo = function(){
+
+		var that = this;
+
+		this.object.children.sort(function(a,b){
+			// console.log(a.geometry.vertices[0].z);
+			return a.geometry.vertices[0].z-b.geometry.vertices[0].z;
+		});
+		// for(var i = 0 ; i < this.object.children.length ; i++){
+		// 	console.log(this.object.children[i].geometry.vertices[0].z);
+		// }
+
+		// this.onFinished(function(u,v){
+
+		var nGeo = new THREE.ParametricGeometry(function(u,v){
+
+			// console.log(u,v);
+			var vec = that.object.children[Math.floor(((u))*(that.object.children.length-1))].geometry.vertices[Math.floor(v*(that.object.children[0].geometry.vertices.length-1))];
+			// console.log(vec);
+			// vec.x*=100;
+			// vec.y*=100;
+			// vec.z = Math.random()*100;
+			return(vec);
+
+		},that.object.children[0].geometry.vertices.length,that.object.children.length);
+
+		var geoTube = new THREE.Mesh(nGeo,new THREE.MeshLambertMaterial({side:THREE.DoubleSide}));
+		// console.log(geoTube);
+		// console.log(this.scene);
+		geoTube.rotation.x = -Math.PI/2;
+		geoTube.position.y = -35;
+		this.scene.remove(this.object);
+		this.scene.add(geoTube);
+		this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial()));
+			
+		// });
 
 	};
 
@@ -186,6 +231,10 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		SaveImg.saveImg(this.renderer,n);
 	};
 
+	// ShapeGenerator.prototype.extrudeGeo = function(name) {
+	// 	this.object = this.phalanx.extrudeGeo();
+	// };
+
 	/**
 	 *  any teardown that needs to happen to remove
 	 *  this object and any objects which it created from memory. 
@@ -205,8 +254,6 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 
 function makeShader(){
-
-
 
 	noiser = "\
 	vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }\

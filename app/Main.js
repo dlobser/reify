@@ -109,6 +109,11 @@ function(ready, $, ShapeGenerator, Keyboard, GUI){
 			gui.hide();
 		});
 
+		Keyboard.bindKey("8", function(){
+			generator.extrudeGeo();
+		});
+
+
 		//for gif output
 		Keyboard.bindKey("7", function(){
 			

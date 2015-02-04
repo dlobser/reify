@@ -129,6 +129,24 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 		return this.Curve;
 	};
 
+	Phalanx.prototype.extrudeGeo = function(){
+
+		var that = this;
+
+		this.onFinished(function(u,v){
+
+			var nGeo = new THREE.ParametricGeometry(function(){
+
+				return(that.Curve.children[Math.floor(u)][Math.floor(v)]);
+
+			},phalanxData.layers,phalanxData.detail);
+
+			return new THREE.Mesh(nGeo,new THREE.MeshLambertMaterial());
+			
+		});
+
+	};
+
 
 	/**
 	 *  get the object. it'll wait until the object is
