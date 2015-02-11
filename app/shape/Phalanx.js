@@ -42,7 +42,7 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 		this._layerStep = 18;
 		this._fillStep = 0;
 		this._layerFill = 0;
-		this._layerSkip = 3;
+		this._layerSkip = 30;
 		this.drawFinished = false;
 
 	};

@@ -239,7 +239,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		if(this.c<32){
 			console.log(this.c);
-			this.gif.addFrame(this.ctx, {copy:true, delay: 2});
+			this.gif.addFrame(this.ctx, {copy:true, delay: 10});
 		}
 		else{
 			console.log('done');
