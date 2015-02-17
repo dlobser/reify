@@ -39,10 +39,10 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 
 		// this.updateFrequency = 5;
 		this._currentLayer = 0;
-		this._layerStep = 18;
+		this._layerStep = 30;
 		this._fillStep = 0;
 		this._layerFill = 0;
-		this._layerSkip = 30;
+		this._layerSkip = 10;
 		this.drawFinished = false;
 
 	};
@@ -210,13 +210,45 @@ function($, THREE, noise, Utils, nGon, CastnGon, phalanxData, shapeData, FileUti
 				verts = verts.concat(children[i].geometry.vertices);
 			}
 
-			Utils.checkLength([verts]);
+			var vertStack = [];
+			var q = 0;
+			var up = 0;
 
-			if(type == "makerBot"){
-				FileUtils.saveGCodeMakerbot([verts], 1);
+			for(var i = 0 ; i < verts.length ; i++){
+
+				// console.log(verts.length);
+
+				if(q==0)
+					vertStack.push([]);
+
+				var vert = verts[i].clone();
+				vert.z-=up*phalanxData.stack*phalanxData.layerHeight;
+
+				vertStack[vertStack.length-1].push(vert);
+
+				q++;
+				if(q>phalanxData.stack*phalanxData.detail){
+					console.log(q);
+					q=0;
+					up++;
+				}
 			}
-			else if(type == "ultiMaker"){
-				FileUtils.saveGCodeUltimaker([verts], 1);
+			
+			console.log(vertStack.length);
+
+			var ID = (.5+(Math.sin(Date.now()*.00001)*.5)).toFixed(4)*10000;
+
+			// Utils.checkLength([verts]);
+
+			for(var i = 0 ; i < vertStack.length ; i++){
+
+				console.log(vertStack[i]);
+				if(type == "makerBot"){
+					FileUtils.saveGCodeMakerbot([vertStack[i]], "real_"+ID+"_"+i);
+				}
+				else if(type == "ultiMaker"){
+					FileUtils.saveGCodeUltimaker([vertStack[i]], "ulti");
+				}
 			}
 
 			that._layerSkip = 3;

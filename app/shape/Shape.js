@@ -31,7 +31,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		this.camera = new THREE.PerspectiveCamera( 60, width / height, 1, 20000 );
 
 		this.animCamera = new THREE.PerspectiveCamera( 60,1, 1, 20000 );
-		this.animCamera.position.z = 30;
+		this.animCamera.position.z = 60;
 		this.animCamera.position.y = 50;
 		this.animCamera.lookAt(new THREE.Vector3 (0.0, 25.0, 0.0));
 
@@ -42,7 +42,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		container.append(this.renderer.domElement);
 
-		this.camera.position.z = 140;
+		this.camera.position.z = 340;
 		this.camera.position.y = 0;
 		this.camera.lookAt(new THREE.Vector3 (0.0, 0.0, 0.0));
 		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement);
@@ -64,7 +64,7 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		this.scene.add(this.phalanx.Curve);
 
 		this.phalanx.Curve.rotation.x = -Math.PI/2;
-		this.phalanx.Curve.position.y = -35;
+		this.phalanx.Curve.position.y = -535;
 		this.ruler.position.y = -35;
 
 		this.counter = 0;

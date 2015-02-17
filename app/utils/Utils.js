@@ -488,7 +488,10 @@ define(["THREE", "ModelGenerator/interface/Font", "ModelGenerator/utils/CurveBak
 				return nurbsCurve;
 		},
 
-		saveGCode:function(arr,scalar) {
+		saveGCode:function(arr,name) {
+
+			scalar =1;
+			var n = name || "output.gcode";
 
 			var minX = 0;
 			var minY = 0;
@@ -594,10 +597,10 @@ define(["THREE", "ModelGenerator/interface/Font", "ModelGenerator/utils/CurveBak
 			}
 			console.log("saved");
 			var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
-			saveAs(blob, name);
+			saveAs(blob, n);
 		},
 
-		saveGCodeMakerbot:function(arr,scalar) {
+		saveGCodeMakerbot:function(arr,name) {
 
 			// var minX = 0;
 			// var minY = 0;
@@ -689,7 +692,7 @@ define(["THREE", "ModelGenerator/interface/Font", "ModelGenerator/utils/CurveBak
 				}
 				  
 			}
-			console.log("saved");
+			console.log("saved " + name);
 			var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
 			saveAs(blob, name);
 		},
