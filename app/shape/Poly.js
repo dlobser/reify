@@ -32,7 +32,6 @@ function(THREE, noise, Utils){
 
         this.counter = args.counter || 0;
 
-
     }
 
     Poly.prototype.makeCurve = function(){
@@ -74,114 +73,118 @@ function(THREE, noise, Utils){
         var verts = [];
         var colors = [];
 
+        //p is for double walls
+        for(var p = 0 ; p < 1+(1+(Math.round(aData.tpTwist)*-1)) ; p++){
+            for(var i = 0 ; i < this.detail ; i++){
 
-        for(var i = 0 ; i < this.detail ; i++){
+                var io = i/(this.detail);
 
-            var io = i/(this.detail);
+                var pos,aim;
 
-            var pos,aim;
+                var off = 0.0001;
 
-            var off = 0.0001;
+                pos = this.getPointAt(io,aData.linearSpline);
+                aim = this.getPointAt(io+off,aData.linearSpline);
 
-            pos = this.getPointAt(io,aData.linearSpline);
-            aim = this.getPointAt(io+off,aData.linearSpline);
+                if(typeof pos.cPos == 'undefined')
+                    pos.cPos = io*this.sides;
 
-            if(typeof pos.cPos == 'undefined')
-                pos.cPos = io*this.sides;
+                if(typeof this.originalLinearCurve !== 'undefined'){
+                    var point = this.originalLinearCurve.getEvenPointAt(io);
+                    pos.dPos = point.cPos;
+                }
+                else
+                    pos.dPos = pos.cPos;
 
-            if(typeof this.originalLinearCurve !== 'undefined'){
-                var point = this.originalLinearCurve.getEvenPointAt(io);
-                pos.dPos = point.cPos;
+                base.position = pos;
+
+                base.lookAt(aim);
+                base.up = new THREE.Vector3(0,0,1);
+
+                var twist2 = this.counter*(aData.tpTwist2*0.5);
+                var twist = this.counter*Math.PI*(Math.round(aData.tpTwist));
+                var petals = Math.floor(aData.tpPetals*8)/(this.lerpCtrlAmount+1);
+                var petalMult = aData.tpMult;
+                var petalLoop = aData.tpLoop;
+                var cornerMult = aData.tpCornerMult;
+                var cornerCos = (1+Math.cos(Math.PI+pos.dPos*Math.PI*2))/2;
+
+                var vecc = (Utils.bakedWave(
+                            (twist2*0.5+twist*3)+
+                            pos.cPos*Math.PI*2*
+                            (petals),aData.sinTri)*
+                        petalMult*5*
+                        Math.max(
+                            (cornerMult),
+                            cornerCos
+                        ))+p*.4;
+
+                kid.position.x  = vecc;
+
+                kid.position.z = Math.cos(
+                            (twist2*0.5+twist*3)+
+                            pos.cPos*Math.PI*2*
+                            (petals))*
+                        petalLoop*5*
+                        Math.max(
+                            (cornerMult),
+                            cornerCos
+                        );
+
+
+
+                var vec = new THREE.Vector3();
+                this.CTRL.updateMatrixWorld();
+                base.updateMatrixWorld();
+                vec.setFromMatrixPosition(kid.matrixWorld);
+                vec.t = pos.cPos;
+
+                //colors
+
+                var col = (Math.PI+vecc)/(Math.PI*4); //turtle mult
+                var colVec = Utils.vec(col);
+                var col2 = Math.abs((kid.position.z)/(Math.PI*2));
+                var c = noise(vec.x*0.1,vec.y*0.1,vec.z*0.1)/5;
+                var c2 = 0.7+noise(vec.x*0.12,vec.y*0.12,vec.z*0.12)/5;
+                var c3 = (.5+Math.sin(vec.distanceTo(new THREE.Vector3(0,0,vec.z))*.5))/6;
+                var ribs = (.25+(1+Math.sin(this.counter))/16);
+                var ribVec = Utils.vec(ribs);
+                ribs+=col;
+                ribs+=c;
+                var bulgeColor = (this.bulgeAmount-.75)/2;
+                var bulgeVec = Utils.vec(bulgeColor).multiply(Utils.vec(.6,.8,1));
+                ribs+=bulgeColor*.5;
+                var colorVec = Utils.vec();
+                colorVec.add(ribVec);
+                colorVec.add(colVec);
+                colorVec.add(bulgeVec);
+
+                if(verts.length>4 && p==0){
+                    var a = Utils.findAngle(verts[i-4],verts[i-2],verts[i-3]);
+                    a*=.314;
+                    var angle = Math.max(aData.tpMult,a);
+                    // colorVec.multiply(Utils.vec(angle*.314));
+                    colors[i-3].r*=angle;colors[i-3].g*=angle;colors[i-3].b*=angle;
+                }
+
+                colors.push(new THREE.Color(colorVec.x,colorVec.y,colorVec.z));
+                // colors.push(new THREE.Color(1,1,1));
+
+                //end colors
+
+                if(i===0){
+                    verts["id"+pos.cPos] = i;
+                }
+                if(pos.cPos/Math.floor(pos.cPos)==1){
+                    verts["id"+pos.cPos] = i;
+                }
+
+                vec.z=this.CTRL.position.z;
+
+                if(i>0)
+                    verts.push(vec);
+
             }
-            else
-                pos.dPos = pos.cPos;
-
-            base.position = pos;
-
-            base.lookAt(aim);
-            base.up = new THREE.Vector3(0,0,1);
-
-            var twist2 = this.counter*(aData.tpTwist2*0.5);
-            var twist = this.counter*Math.PI*(Math.round(aData.tpTwist));
-            var petals = Math.floor(aData.tpPetals*8)/(this.lerpCtrlAmount+1);
-            var petalMult = aData.tpMult;
-            var petalLoop = aData.tpLoop;
-            var cornerMult = aData.tpCornerMult;
-            var cornerCos = (1+Math.cos(Math.PI+pos.dPos*Math.PI*2))/2;
-
-            var vecc = Utils.bakedWave(
-                        (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2*
-                        (petals),aData.sinTri)*
-                    petalMult*5*
-                    Math.max(
-                        (cornerMult),
-                        cornerCos
-                    );
-
-            kid.position.x  = vecc;
-
-            kid.position.z = Math.cos(
-                        (twist2*0.5+twist*3)+
-                        pos.cPos*Math.PI*2*
-                        (petals))*
-                    petalLoop*5*
-                    Math.max(
-                        (cornerMult),
-                        cornerCos
-                    );
-
-
-
-            var vec = new THREE.Vector3();
-            this.CTRL.updateMatrixWorld();
-            base.updateMatrixWorld();
-            vec.setFromMatrixPosition(kid.matrixWorld);
-            vec.t = pos.cPos;
-
-            //colors
-
-            var col = (Math.PI+vecc)/(Math.PI*4); //turtle mult
-            var colVec = Utils.vec(col);
-            var col2 = Math.abs((kid.position.z)/(Math.PI*2));
-            var c = noise(vec.x*0.1,vec.y*0.1,vec.z*0.1)/5;
-            var c2 = 0.7+noise(vec.x*0.12,vec.y*0.12,vec.z*0.12)/5;
-            var c3 = (.5+Math.sin(vec.distanceTo(new THREE.Vector3(0,0,vec.z))*.5))/6;
-            var ribs = (.25+(1+Math.sin(this.counter))/16);
-            var ribVec = Utils.vec(ribs);
-            ribs+=col;
-            ribs+=c;
-            var bulgeColor = (this.bulgeAmount-.75)/2;
-            var bulgeVec = Utils.vec(bulgeColor).multiply(Utils.vec(.6,.8,1));
-            ribs+=bulgeColor*.5;
-            var colorVec = Utils.vec();
-            colorVec.add(ribVec);
-            colorVec.add(colVec);
-            colorVec.add(bulgeVec);
-            if(verts.length>4){
-                var a = Utils.findAngle(verts[i-4],verts[i-2],verts[i-3]);
-                a*=.314;
-                var angle = Math.max(aData.tpMult,a);
-                // colorVec.multiply(Utils.vec(angle*.314));
-                colors[i-3].r*=angle;colors[i-3].g*=angle;colors[i-3].b*=angle;
-
-            }
-            colors.push(new THREE.Color(colorVec.x,colorVec.y,colorVec.z));
-
-            //end colors
-
-            if(i===0){
-                verts["id"+pos.cPos] = i;
-            }
-            if(pos.cPos/Math.floor(pos.cPos)==1){
-                verts["id"+pos.cPos] = i;
-            }
-
-            vec.z=this.CTRL.position.z;
-
-            if(i>0)
-                verts.push(vec);
-
         }
 
         this.geo.vertices = verts;

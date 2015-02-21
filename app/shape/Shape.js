@@ -24,6 +24,8 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 
 		// console.log("[["+tri+"],["+square+"],["+saw+"]]"+"");
 
+		var stacked = true;
+
 		this.width=width;
 		this.height=height;
 		// this.needsUpdate = true;
@@ -60,11 +62,16 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		var light = new THREE.DirectionalLight( 0xdddddd ); light.position = new THREE.Vector3(-1,0,-.5); this.lightGroup.add( light );
 		this.scene.add(this.lightGroup);
 
-		this.phalanx = new Phalanx();
+		this.phalanx = new Phalanx({stacked:stacked});
 		this.scene.add(this.phalanx.Curve);
 
 		this.phalanx.Curve.rotation.x = -Math.PI/2;
-		this.phalanx.Curve.position.y = -535;
+
+		if(stacked)
+			this.phalanx.Curve.position.y = -335;
+		else
+			this.phalanx.Curve.position.y = -35;
+
 		this.ruler.position.y = -35;
 
 		this.counter = 0;
@@ -159,6 +166,14 @@ function(THREE, FileUtils, OrbitControls, noise, Phalanx, nGon, Songs, Utils, Sa
 		// this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(1),new THREE.MeshLambertMaterial()));
 			
 		// });
+
+	};
+
+	ShapeGenerator.prototype.saveGeo = function(){
+
+		saver(this.scene);
+		// var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
+		// saveAs(blob, name);
 
 	};
 

@@ -1,6 +1,12 @@
 define(function(){
 
+
+
 	function saveGCode(arr,scalar,height) {
+
+		//this code is available under a creative commons license
+		//David Lobser - info@dlobser.com http://www.dlobser.com
+		//http://creativecommons.org/licenses/by-sa/4.0/
 
 		var layerHeight = height || 0.27;
 
@@ -128,6 +134,10 @@ define(function(){
 
 	function saveGCodeUltimaker(arr,scalar,height) {
 
+		//this code is available under a creative commons license
+		//David Lobser - info@dlobser.com http://www.dlobser.com
+		//http://creativecommons.org/licenses/by-sa/4.0/
+
 		var layerHeight = height || .27;
 
 		var output = ";FLAVOR:UltiGCode\n;TIME:1081      \n;MATERIAL:1177      \n;MATERIAL2:0         \n\n;Layer count: 170\n;LAYER:0\nM107\nG1 F1200 X20.360 Y20.859 Z0.300 E-2.0\n;TYPE:WALL-OUTER\n";
@@ -173,11 +183,44 @@ define(function(){
 
 	function saveGCodeMakerbot(arr,name) {
 
+		//this code is available under a creative commons license
+		//David Lobser - info@dlobser.com http://www.dlobser.com
+		//http://creativecommons.org/licenses/by-sa/4.0/
+
 		var scalar = 1;
 
+		var minX = 1e6;
+		var minY = 1e6;
+		var minZ = 1e6;
+
+		var maxX=maxY=maxZ=-1e6;
+
+		var X = Y = 0;
+
+		for(var i = 0 ; i < arr.length ; i++){
+			for(j = 0 ; j < arr[i].length ; j++){
+				if(minX>arr[i][j].x)
+					minX = arr[i][j].x;
+				if(minY>arr[i][j].y)
+					minY = arr[i][j].y;
+				// if(minZ>arr[i][j].z)
+				// 	minZ = arr[i][j].z;
+				if(maxX<arr[i][j].x)
+					maxX = arr[i][j].x;
+				if(maxY<arr[i][j].y)
+					maxY = arr[i][j].y;
+				// if(maxZ<arr[i][j].z)
+				// 	maxZ = arr[i][j].z;
+			}
+		}
+
+		var aX = minX+((maxX-minX)/2);
+		var aY = minY+((maxY-minY)/2);
+		// var aZ = minZ+((maxZ-minZ)/2);
+
+		console.log(minX,maxX,minY,maxY,aX,aY);
 
 		var output = " \nM73 P0 (enable build progress)\nG21 (set units to mm)\nG90 (set positioning to absolute)\nG10 P1 X-16.5 Y0 Z0 (Designate T0 Offset)\nG55 (Recall offset cooridinate system)\n(**** begin homing ****)\nG162 X Y F00 (home XY axes maximum)\nG161 Z F1100 (home Z axis minimum)\nG92 Z-5 (set Z to -5)\nG1 Z0.0 (move Z to ÔøΩ0?)\nG161 Z F100 (home Z axis minimum)\nM132 X Y Z A B (Recall stored home offsets for XYZAB axis)\n(**** end homing ****)\nG1 X112 Y-73 Z155 F3300.0 (move to waiting position)\nG130 X0 Y0 A0 B0 (Lower stepper Vrefs while heating)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nM104 S230 T0 (set extruder temperature)\nM6 T0 (wait for toolhead, and HBP to reach temperature)\nG130 X127 Y127 A127 B127 (Set Stepper motor Vref to defaults)\nM108 R3.0 T0\nG0 X112 Y-73 (Position Nozzle)\nG0 Z0.2 (Position Height)\nM108 R4.0 (Set Extruder Speed)\nM101 (Start Extruder)\nG4 P1500 (Create Anchor)\n";
-
 
 		for(var i = 0 ; i < arr.length ; i++){
 
@@ -188,23 +231,32 @@ define(function(){
 					zed=0;
 				zed+=.3;
 
-				var X = arr[i][j].x * scalar;
-				var Y = arr[i][j].y * scalar;
-				
+				X = arr[i][j].x * scalar;
+				Y = arr[i][j].y * scalar;
+
+				X-=aX;
+				Y-=aY;
 					
 				output+="G1 X" + X;
 				output+=" Y"  + Y;
 				output+=" Z"  + zed;
 				output+=" F2000";
 				output+='\n';
-
 			   
 			}
 			  
 		}
+
+		output+="G1 X" + X;
+		output+=" Y"  + Y;
+		output+=" Z"  + zed + 15;
+		output+=" F2000";
+		output+='\n';
+
 		console.log("saved " + name);
 		var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
 		saveAs(blob, name);
+
 	}
 
 	// function saveImg(r,name) {
@@ -427,7 +479,93 @@ define(function(){
 		return saveAs;
 	}(self));
 
+	saveGeoToObj = function (geo,nums,scalar) {
+
+		geo.updateMatrixWorld();
+
+		var num = parseInt(nums);
+
+		var s = '';
+		for (i = 0; i < geo.geometry.vertices.length; i++) {
+
+			var vector = new THREE.Vector3( geo.geometry.vertices[i].x, geo.geometry.vertices[i].y, geo.geometry.vertices[i].z );
+			
+			geo.matrixWorld.multiplyVector3( vector );
+			vector.multiplyScalar(scalar);
+			//vector.applyProjection( matrix )
+			
+			s+= 'v '+(vector.x) + ' ' +
+			vector.y + ' '+
+			vector.z + '\n';
+		}
+
+		for (i = 0; i < geo.geometry.faces.length; i++) {
+
+			s+= 'f '+ (geo.geometry.faces[i].a+1+num) + ' ' +
+			(geo.geometry.faces[i].b+1+num) + ' '+
+			(geo.geometry.faces[i].c+1+num);
+
+			if (geo.geometry.faces[i].d!==undefined) {
+				s+= ' '+ (geo.geometry.faces[i].d+1+num);
+			}
+			s+= '\n';
+		}
+
+		return s;
+	};
+
+
+	saver = function(scene) {
+
+		//this code is available under a creative commons license
+		//David Lobser - info@dlobser.com http://www.dlobser.com
+		//http://creativecommons.org/licenses/by-sa/4.0/
+
+		var scaleOut = 1;//outputScale || 1;
+
+		var name = name || "tree.obj";
+
+		var mshArray = [];
+
+		var returnerArray = [];
+
+		scene.traverse(function(obj){
+			if(obj.geometry){
+				obj.updateMatrixWorld();
+				if(obj.geometry.vertices.length>0){
+					returnerArray.push(obj);
+				}
+			}
+		});
+
+		mshArray = returnerArray;
+
+		// alert("saving!");
+		var j = 0;
+		var output = "";
+		console.log(mshArray);
+		
+		for (var i = 0 ; i < mshArray.length ; i++){
+			
+			// if(i == mshArray.length-2 || i == mshArray.length-3) i++;
+			// else{
+				output += saveGeoToObj(mshArray[i],j,(1*scaleOut));
+				j += mshArray[i].geometry.vertices.length;
+			// }
+		}
+		
+		output.replace("undefined","");
+		// document.write(output);
+		console.log(output);
+		alert("saved!");
+		var blob = new Blob([output], {type: "text/plain;charset=ANSI"});
+		saveAs(blob, name);
+	};
+
 	return {
+		saveAs : saveAs,
+		saver : saver,
+		saveGeoToObj : saveGeoToObj,
 		saveGCode : saveGCode,
 		saveGCodeMakerbot : saveGCodeMakerbot,
 		saveGCodeUltimaker : saveGCodeUltimaker,
